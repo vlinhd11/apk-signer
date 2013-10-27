@@ -173,7 +173,7 @@ object Preferences {
      * @return the value of the given key, or {@code default} if the given key
      *         does not exist.
      */
-    def get(String k, String default): String = {
+    def get(k: String, default: String): String = {
         if (mTransaction != null && mTransaction.containsKey(k))
             mTransaction.getProperty(k, default)
         else
