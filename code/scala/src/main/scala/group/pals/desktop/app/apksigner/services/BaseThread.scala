@@ -111,7 +111,7 @@ class BaseThread extends Thread {
      * @return {@code true} if any of the listeners handled the message,
      *         {@code false} otherwise.
      */
-    protected def sendNotification(msgId: Int, obj: Object,
+    protected def sendNotification(msgId: Int, obj: Any,
                                    shortMsg: String): Boolean =
         sendNotification(msgId, obj, shortMsg, Texts.NULL)
 
@@ -125,7 +125,7 @@ class BaseThread extends Thread {
      * @return {@code true} if any of the listeners handled the message,
      *         {@code false} otherwise.
      */
-    protected def sendNotification(msgId: Int, obj: Object): Boolean =
+    protected def sendNotification(msgId: Int, obj: Any): Boolean =
         sendNotification(msgId, obj, Texts.NULL)
 
     /**

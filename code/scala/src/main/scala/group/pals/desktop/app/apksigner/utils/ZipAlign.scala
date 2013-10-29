@@ -158,7 +158,7 @@ class ZipAlign {
 
         private var _totalWritten = 0l
         def totalWritten = _totalWritten
-        private totalWritten_= (v: Long) = _totalWritten = v
+        private def totalWritten_=(v: Long) = _totalWritten = v
 
         override def write(b: Array[Byte]) = {
             out.write(b)
@@ -217,6 +217,8 @@ class ZipAlign {
      */
     class ZipAligner(inputFile: File, outputFile: File,
             alignment: Int = DEFAULT_ALIGNMENT) extends BaseThread {
+        
+        import BaseThread._
 
         setName(Messages.getString(R.string.apk_aligner_thread))
 
@@ -289,7 +291,8 @@ class ZipAlign {
             mOutputStream = new FilterOutputStreamEx(new BufferedOutputStream(
                     new FileOutputStream(outputFile), Files.FILE_BUFFER))
 
-            sendNotification(MSG_INFO, mProgress = 5)
+            mProgress = 5
+            sendNotification(MSG_INFO, mProgress)
         }// openFiles()
 
         /**
@@ -300,10 +303,11 @@ class ZipAlign {
          *
          * @throws IOException
          */
-        def copyAllEntries() = {
+        def copyAllEntries(): Unit = {
             val entryCount = mZipFile.size()
             if (entryCount == 0) {
-                sendNotification(MSG_INFO, mProgress += 80)
+                mProgress += 80
+                sendNotification(MSG_INFO, mProgress)
                 return
             }
 
@@ -313,7 +317,7 @@ class ZipAlign {
             while (entries.hasMoreElements() && !isInterrupted()) {
                 val entry = entries.nextElement()
 
-                var flags = entry.getMethod() == ZipEntry.STORED ? 0 : 1 << 3
+                var flags = if (entry.getMethod() == ZipEntry.STORED) 0 else 1 << 3
                 flags |= 1 << 11
 
                 val outputEntryHeaderOffset = mOutputStream.totalWritten
@@ -332,7 +336,7 @@ class ZipAlign {
                         Texts.NULL,
                         "%,15d  %s".format(inputEntryDataOffset, entry.getName()))
 
-                var padding
+                var padding = 0
 
                 if (entry.getMethod() != ZipEntry.STORED) {
                     /*
@@ -420,7 +424,7 @@ class ZipAlign {
                     if ((flags & ZIP_ENTRY_USES_DATA_DESCR) != 0) {
                         if (entry.isDirectory()) 0
                         else
-                            entry.getCompressedSize()) + ZIP_ENTRY_DATA_DESCRIPTOR_LEN
+                            entry.getCompressedSize() + ZIP_ENTRY_DATA_DESCRIPTOR_LEN
                     } else {
                         if (entry.isDirectory()) 0
                         else entry.getCompressedSize()
@@ -429,7 +433,7 @@ class ZipAlign {
                 if (sizeToCopy > 0) {
                     mRafInput.seek(mInputOffset)
 
-                    def read() = {
+                    def read() :Unit= {
                         var totalSizeCopied = 0l
                         val buf = new Array[Byte](Files.FILE_BUFFER)
                         while (totalSizeCopied < sizeToCopy) {
@@ -475,7 +479,7 @@ class ZipAlign {
          *
          * @throws IOException
          */
-        private def buildCentralDirectory() = {
+        private def buildCentralDirectory():Unit = {
             val centralDirOffset = mOutputStream.totalWritten
 
             L.d("\tWriting Central Directory at %,d", centralDirOffset)
@@ -621,6 +625,8 @@ class ZipAlign {
      */
     class ZipAlignmentVerifier(inputFile: File,
             alignment: Int = DEFAULT_ALIGNMENT) extends BaseThread {
+        
+        import BaseThread._
 
         private var mZipFile: ZipFile = null
         private var mRafInput: RandomAccessFile = null
@@ -633,7 +639,7 @@ class ZipAlign {
 
         setName(Messages.getString(R.string.apk_alignment_verifier_thread))
 
-        override def run() = {
+        override def run() :Unit= {
             L.d("%s >> starting", classOf[ZipAlignmentVerifier].getSimpleName())
 
             try {
@@ -677,7 +683,7 @@ class ZipAlign {
          *
          * @throws IOException
          */
-        private def openFiles() = {
+        private def openFiles() :Unit= {
             sendNotification(MSG_INFO, Texts.NULL, "%s\n\n".format(
                     Messages.getString(
                             R.string.pmsg_verifying_alignment_of_apk,
@@ -697,7 +703,7 @@ class ZipAlign {
          *
          * @throws IOException
          */
-        private def verify() = {
+        private def verify() :Unit= {
             val entryCount = mZipFile.size()
             if (entryCount == 0) {
                 sendNotification(MSG_INFO, mProgress += 90)
