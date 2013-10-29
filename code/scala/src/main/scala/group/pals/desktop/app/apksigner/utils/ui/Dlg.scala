@@ -7,13 +7,12 @@
 
 package group.pals.desktop.app.apksigner.utils.ui
 
-import group.pals.desktop.app.apksigner.i18n.Messages
-import group.pals.desktop.app.apksigner.i18n.R
-import group.pals.desktop.app.apksigner.utils.Texts
-
 import java.awt.Component
 import java.awt.Dimension
 
+import group.pals.desktop.app.apksigner.i18n.Messages
+import group.pals.desktop.app.apksigner.i18n.R
+import group.pals.desktop.app.apksigner.utils.Texts
 import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JScrollPane
@@ -43,7 +42,7 @@ object Dlg {
             if (Texts.isEmpty(title)) Messages.getString(R.string.error)
             else title,
             JOptionPane.ERROR_MESSAGE)
-    }// showErrMsg()
+    } // showErrMsg()
 
     /**
      * Shows an error message asynchronously.
@@ -61,7 +60,7 @@ object Dlg {
             override def run() = showErrMsg(comp, title, msg)
 
         })
-    }// showErrMsgAsync()
+    } // showErrMsgAsync()
 
     /**
      * Shows an error message.
@@ -71,7 +70,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showErrMsg(comp: Component, msg: Object) = showErrMsg(comp, null, msg)
+    def showErrMsg(comp: Component, msg: Object): Unit = showErrMsg(comp, null, msg)
 
     /**
      * Shows an error message asynchronously.
@@ -87,7 +86,7 @@ object Dlg {
             override def run() = showErrMsg(comp, msg)
 
         })
-    }// showErrMsgAsync()
+    } // showErrMsgAsync()
 
     /**
      * Shows an error message.
@@ -97,7 +96,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showErrMsg(title: String, msg: Object) = showErrMsg(null, title, msg)
+    def showErrMsg(title: String, msg: Object): Unit = showErrMsg(null, title, msg)
 
     /**
      * Shows an error message asynchronously.
@@ -113,7 +112,7 @@ object Dlg {
             override def run() = showErrMsg(title, msg)
 
         })
-    }// showErrMsgAsync()
+    } // showErrMsgAsync()
 
     /**
      * Shows an error message.
@@ -121,7 +120,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showErrMsg(msg: Object) = showErrMsg(null, null, msg)
+    def showErrMsg(msg: Object): Unit = showErrMsg(null, null, msg)
 
     /**
      * Shows an error message asynchronously.
@@ -135,7 +134,7 @@ object Dlg {
             override def run() = showErrMsg(msg)
 
         })
-    }// showErrMsgAsync()
+    } // showErrMsgAsync()
 
     /**
      * Shows an exception message.
@@ -148,10 +147,10 @@ object Dlg {
      *            the exception.
      */
     def showException(comp: Component, title: String, e: Exception) = {
-        msg: String = Messages.getString(
+        var msg = Messages.getString(
             R.string.pmsg_exception, e.getClass().getName(), e.getMessage())
         showErrMsg(comp, title, msg)
-    }// showException()
+    } // showException()
 
     /**
      * Shows an exception message asynchronously.
@@ -169,7 +168,7 @@ object Dlg {
             override def run() = showException(comp, title, e)
 
         })
-    }// showExceptionAsync()
+    } // showExceptionAsync()
 
     /**
      * Shows an exception message.
@@ -179,7 +178,7 @@ object Dlg {
      * @param e
      *            the exception.
      */
-    def showException(comp: Component, e: Exception) = showException(comp, null, e)
+    def showException(comp: Component, e: Exception): Unit = showException(comp, null, e)
 
     /**
      * Shows an exception message asynchronously.
@@ -195,7 +194,7 @@ object Dlg {
             override def run() = showException(comp, e)
 
         })
-    }// showExceptionAsync()
+    } // showExceptionAsync()
 
     /**
      * Shows an exception message.
@@ -205,7 +204,7 @@ object Dlg {
      * @param e
      *            the exception.
      */
-    def showException(title: String, e: Exception) = showException(null, title, e)
+    def showException(title: String, e: Exception): Unit = showException(null, title, e)
 
     /**
      * Shows an exception message asynchronously.
@@ -221,7 +220,7 @@ object Dlg {
             override def run() = showException(title, e)
 
         })
-    }// showExceptionAsync()
+    } // showExceptionAsync()
 
     /**
      * Shows an exception message.
@@ -229,7 +228,7 @@ object Dlg {
      * @param e
      *            the exception.
      */
-    def showException(e: Exception) = showException(null, null, e)
+    def showException(e: Exception): Unit = showException(null, null, e)
 
     /**
      * Shows an exception message asynchronously.
@@ -243,7 +242,7 @@ object Dlg {
             override def run() = showException(e)
 
         })
-    }// showExceptionAsync()
+    } // showExceptionAsync()
 
     /**
      * Shows an information message.
@@ -262,7 +261,7 @@ object Dlg {
             if (Texts.isEmpty(title)) Messages.getString(R.string.information)
             else title,
             JOptionPane.INFORMATION_MESSAGE)
-    }// showInfoMsg()
+    } // showInfoMsg()
 
     /**
      * Shows an information message asynchronously.
@@ -280,7 +279,7 @@ object Dlg {
             override def run() = showInfoMsg(comp, title, msg)
 
         })
-    }// showInfoMsgAsync()
+    } // showInfoMsgAsync()
 
     /**
      * Shows an information message.
@@ -290,7 +289,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showInfoMsg(title: String, msg: Object) = showInfoMsg(null, title, msg)
+    def showInfoMsg(title: String, msg: Object): Unit = showInfoMsg(null, title, msg)
 
     /**
      * Shows an information message asynchronously.
@@ -306,7 +305,7 @@ object Dlg {
             override def run() = showInfoMsg(title, msg)
 
         })
-    }// showInfoMsgAsync()
+    } // showInfoMsgAsync()
 
     /**
      * Shows an information message.
@@ -316,7 +315,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showInfoMsg(comp: Component, msg: Object) = showInfoMsg(comp, null, msg)
+    def showInfoMsg(comp: Component, msg: Object): Unit = showInfoMsg(comp, null, msg)
 
     /**
      * Shows an information message asynchronously.
@@ -332,7 +331,7 @@ object Dlg {
             override def run() = showInfoMsg(comp, msg)
 
         })
-    }// showInfoMsgAsync()
+    } // showInfoMsgAsync()
 
     /**
      * Shows an information message.
@@ -340,7 +339,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showInfoMsg(msg: Object) = showInfoMsg(null, null, msg)
+    def showInfoMsg(msg: Object): Unit = showInfoMsg(null, null, msg)
 
     /**
      * Shows an information message asynchronously.
@@ -354,7 +353,7 @@ object Dlg {
             override def run() = showInfoMsg(msg)
 
         })
-    }// showInfoMsgAsync()
+    } // showInfoMsgAsync()
 
     /**
      * Shows a huge information message. The dialog size will be hardcoded with
@@ -372,7 +371,7 @@ object Dlg {
      *            the dialog height.
      */
     def showHugeInfoMsg(comp: Component, title: String, msg: String, width: Int,
-            height: Int) = {
+                        height: Int) = {
         var scrollPane = new JScrollPane(new JLabel(msg))
         if (width > 0 && height > 0) {
             var size = new Dimension(width, height)
@@ -382,7 +381,7 @@ object Dlg {
         }
 
         showInfoMsg(comp, title, scrollPane)
-    }// showHugeInfoMsg()
+    } // showHugeInfoMsg()
 
     /**
      * Shows a huge information message asynchronously. The dialog size will be
@@ -400,13 +399,13 @@ object Dlg {
      *            the dialog height.
      */
     def showHugeInfoMsgAsync(comp: Component, title: String, msg: String,
-            width: Int, height: Int) = {
+                             width: Int, height: Int) = {
         SwingUtilities.invokeLater(new Runnable() {
 
             override def run() = showHugeInfoMsg(comp, title, msg, width, height)
 
         })
-    }// showHugeInfoMsgAsync()
+    } // showHugeInfoMsgAsync()
 
     /**
      * Shows a huge information message. The dialog size will be hardcoded with
@@ -421,7 +420,7 @@ object Dlg {
      * @param height
      *            the dialog height.
      */
-    def showHugeInfoMsg(title: String, msg: String, width: Int, height: Int) =
+    def showHugeInfoMsg(title: String, msg: String, width: Int, height: Int): Unit =
         showHugeInfoMsg(null, title, msg, width, height)
 
     /**
@@ -438,13 +437,13 @@ object Dlg {
      *            the dialog height.
      */
     def showHugeInfoMsgAsync(title: String, msg: String, width: Int,
-            height: Int) = {
+                             height: Int) = {
         SwingUtilities.invokeLater(new Runnable() {
 
             override def run() = showHugeInfoMsg(title, msg, width, height)
 
         })
-    }// showHugeInfoMsgAsync()
+    } // showHugeInfoMsgAsync()
 
     /**
      * Shows a huge information message. The dialog size will be hardcoded with
@@ -459,7 +458,7 @@ object Dlg {
      * @param height
      *            the dialog height.
      */
-    def showHugeInfoMsg(comp: Component, msg: String, width: Int, height: Int) =
+    def showHugeInfoMsg(comp: Component, msg: String, width: Int, height: Int): Unit =
         showHugeInfoMsg(comp, null, msg, width, height)
 
     /**
@@ -476,13 +475,13 @@ object Dlg {
      *            the dialog height.
      */
     def showHugeInfoMsgAsync(comp: Component, msg: String, width: Int,
-            height: Int) = {
+                             height: Int) = {
         SwingUtilities.invokeLater(new Runnable() {
 
             override def run() = showHugeInfoMsg(comp, msg, width, height)
 
         })
-    }// showHugeInfoMsgAsync()
+    } // showHugeInfoMsgAsync()
 
     /**
      * Shows a huge information message. The dialog size will be hardcoded with
@@ -495,7 +494,7 @@ object Dlg {
      * @param height
      *            the dialog height.
      */
-    def showHugeInfoMsg(msg: String, width: Int, height: Int) =
+    def showHugeInfoMsg(msg: String, width: Int, height: Int): Unit =
         showHugeInfoMsg(null, null, msg, width, height)
 
     /**
@@ -515,7 +514,7 @@ object Dlg {
             override def run() = showHugeInfoMsg(msg, width, height)
 
         })
-    }// showHugeInfoMsgAsync()
+    } // showHugeInfoMsgAsync()
 
     /**
      * Shows a warning message.
@@ -550,7 +549,7 @@ object Dlg {
             override def run() = showWarningMsg(comp, title, msg)
 
         })
-    }// showWarningMsgAsync()
+    } // showWarningMsgAsync()
 
     /**
      * Shows a warning message.
@@ -560,7 +559,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showWarningMsg(comp: Component, msg: Object) = showWarningMsg(comp, null, msg)
+    def showWarningMsg(comp: Component, msg: Object): Unit = showWarningMsg(comp, null, msg)
 
     /**
      * Shows a warning message asynchronously.
@@ -576,7 +575,7 @@ object Dlg {
             override def run() = showWarningMsg(comp, msg)
 
         })
-    }// showWarningMsgAsync()
+    } // showWarningMsgAsync()
 
     /**
      * Shows a warning message.
@@ -586,7 +585,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showWarningMsg(title: String, msg: Object) = showWarningMsg(null, title, msg)
+    def showWarningMsg(title: String, msg: Object): Unit = showWarningMsg(null, title, msg)
 
     /**
      * Shows a warning message asynchronously.
@@ -602,7 +601,7 @@ object Dlg {
             override def run() = showWarningMsg(title, msg)
 
         })
-    }// showWarningMsgAsync()
+    } // showWarningMsgAsync()
 
     /**
      * Shows a warning message.
@@ -610,7 +609,7 @@ object Dlg {
      * @param msg
      *            the message.
      */
-    def showWarningMsg(msg: Object) = showWarningMsg(null, null, msg)
+    def showWarningMsg(msg: Object): Unit = showWarningMsg(null, null, msg)
 
     /**
      * Shows a warning message asynchronously.
@@ -624,7 +623,7 @@ object Dlg {
             override def run() = showWarningMsg(msg)
 
         })
-    }// showWarningMsgAsync()
+    } // showWarningMsgAsync()
 
     /**
      * Shows a yes-no confirmation dialog.
@@ -641,16 +640,16 @@ object Dlg {
      * @return {@code true} if the user chose "Yes", otherwise {@code false}.
      */
     def confirmYesNo(comp: Component, title: String, msg: Object,
-            defaultYes: Boolean): Boolean = {
-        val options = Array(Messages.getString(R.string.yes),
-                            Messages.getString(R.string.no))
+                     defaultYes: Boolean): Boolean = {
+        val options = Array[Object](Messages.getString(R.string.yes),
+            Messages.getString(R.string.no))
         JOptionPane.showOptionDialog(
             comp, msg,
             if (Texts.isEmpty(title)) Messages.getString(R.string.confirmation)
             else title,
             JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
             options, options(if (defaultYes) 0 else 1)) == 0
-    }// confirmYesNo()
+    } // confirmYesNo()
 
     /**
      * Shows a yes-no confirmation dialog.

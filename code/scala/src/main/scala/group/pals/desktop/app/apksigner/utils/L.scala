@@ -7,6 +7,9 @@
 
 package group.pals.desktop.app.apksigner.utils
 
+import java.io.PrintWriter
+import java.io.StringWriter
+
 /**
  * Logger.
  *
@@ -26,7 +29,7 @@ object L {
      *            the objects to be formatted with {@code msg}.
      */
     def out(tag: Any, msg: String, args: Any*) =
-        printf("[%s] %s\n", tag, msg.format(args : _*))
+        printf("[%s] %s\n", tag, msg.format(args: _*))
 
     /**
      * Prints log to error output console.
@@ -39,7 +42,7 @@ object L {
      *            the objects to be formatted with {@code msg}.
      */
     def err(tag: Any, msg: String, args: Any*) =
-        System.err.println("[%s] %s".format(tag, msg.format(args : _*)))
+        System.err.println("[%s] %s".format(tag, msg.format(args: _*)))
 
     /**
      * Prints debug log.
@@ -49,7 +52,7 @@ object L {
      * @param args
      *            the objects to be formatted with {@code msg}.
      */
-    def d(msg: String, args: Any*) = out("DEBUG", msg, args : _*)
+    def d(msg: String, args: Any*) = out("DEBUG", msg, args: _*)
 
     /**
      * Prints information log.
@@ -59,7 +62,7 @@ object L {
      * @param args
      *            the objects to be formatted with {@code msg}.
      */
-    def i(msg: String, args: Any*) = out("INFO", msg, args : _*)
+    def i(msg: String, args: Any*) = out("INFO", msg, args: _*)
 
     /**
      * Prints "verbose" log.
@@ -69,7 +72,7 @@ object L {
      * @param args
      *            the objects to be formatted with {@code msg}.
      */
-    def v(msg: String, args: Any*) = out("VERBOSE", msg, args : _*)
+    def v(msg: String, args: Any*) = out("VERBOSE", msg, args: _*)
 
     /**
      * Prints error log.
@@ -79,7 +82,7 @@ object L {
      * @param args
      *            the objects to be formatted with {@code msg}.
      */
-    def e(msg: String, args: Any*) = err("ERROR", msg, args : _*)
+    def e(msg: String, args: Any*) = err("ERROR", msg, args: _*)
 
     /**
      * Prints the stack trace.
@@ -97,6 +100,6 @@ object L {
         } finally {
             printWriter.close()
         }
-    }// printStackTrace()
+    } // printStackTrace()
 
 }// L

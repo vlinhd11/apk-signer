@@ -7,17 +7,16 @@
 
 package group.pals.desktop.app.apksigner.ui.prefs
 
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Insets
+
 import group.pals.desktop.app.apksigner.i18n.Messages
 import group.pals.desktop.app.apksigner.i18n.R
 import group.pals.desktop.app.apksigner.utils.Preferences
 import group.pals.desktop.app.apksigner.utils.Texts
 import group.pals.desktop.app.apksigner.utils.ui.Dlg
 import group.pals.desktop.app.apksigner.utils.ui.JEditorPopupMenu
-
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
-
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JPasswordField
@@ -48,8 +47,8 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     var gridBagLayout = new GridBagLayout()
     gridBagLayout.columnWidths = Array(0, 0)
     gridBagLayout.rowHeights = Array(0, 0)
-    gridBagLayout.columnWeights = Array(1d, Double.MIN_VALUE)
-    gridBagLayout.rowWeights = Array(1d, Double.MIN_VALUE)
+    gridBagLayout.columnWeights = Array(1d, Double.MinValue)
+    gridBagLayout.rowWeights = Array(1d, Double.MinValue)
     setLayout(gridBagLayout)
 
     var panel = new JPanel()
@@ -61,12 +60,12 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     var gbl_panel = new GridBagLayout()
     gbl_panel.columnWidths = Array(0, 0, 0)
     gbl_panel.rowHeights = Array(0, 0, 0, 0)
-    gbl_panel.columnWeights = Array(1d, 1d, Double.MIN_VALUE)
-    gbl_panel.rowWeights = Array(0d, 0d, 0d, Double.MIN_VALUE)
+    gbl_panel.columnWeights = Array(1d, 1d, Double.MinValue)
+    gbl_panel.rowWeights = Array(0d, 0d, 0d, Double.MinValue)
     panel.setLayout(gbl_panel)
 
     mChkUseProxy = new JCheckBox(Messages.getString(R.string.use_proxy))
-    mChkUseProxy.setSelected(Preferences.instance.usingProxy)
+    mChkUseProxy.setSelected(Preferences.usingProxy)
     var gbc_mChkUseProxy = new GridBagConstraints()
     gbc_mChkUseProxy.anchor = GridBagConstraints.WEST
     gbc_mChkUseProxy.insets = new Insets(10, 5, 5, 5)
@@ -78,7 +77,7 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     mTextProxyHost.setBorder(new TitledBorder(
         null, Messages.getString(R.string.host), TitledBorder.LEADING,
         TitledBorder.TOP, null, null))
-    mTextProxyHost.setText(Preferences.instance.proxyHost)
+    mTextProxyHost.setText(Preferences.proxyHost)
     var gbc_mTextProxyHost = new GridBagConstraints()
     gbc_mTextProxyHost.insets = new Insets(3, 3, 3, 3)
     gbc_mTextProxyHost.fill = GridBagConstraints.HORIZONTAL
@@ -91,7 +90,7 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     mTextProxyPort.setBorder(new TitledBorder(
         null, Messages.getString(R.string.port), TitledBorder.LEADING,
         TitledBorder.TOP, null, null))
-    mTextProxyPort.setText(Preferences.instance.proxyPort.toString())
+    mTextProxyPort.setText(Preferences.proxyPort.toString())
     var gbc_mTextProxyPort = new GridBagConstraints()
     gbc_mTextProxyPort.insets = new Insets(3, 3, 3, 3)
     gbc_mTextProxyPort.fill = GridBagConstraints.HORIZONTAL
@@ -104,7 +103,7 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     mTextProxyUsername.setBorder(new TitledBorder(
         null, Messages.getString(R.string.username), TitledBorder.LEADING,
         TitledBorder.TOP, null, null))
-    mTextProxyUsername.setText(Preferences.instance.proxyUsername)
+    mTextProxyUsername.setText(Preferences.proxyUsername)
     var gbc_mTextProxyUsername = new GridBagConstraints()
     gbc_mTextProxyUsername.insets = new Insets(3, 3, 3, 3)
     gbc_mTextProxyUsername.fill = GridBagConstraints.HORIZONTAL
@@ -117,7 +116,7 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     mTextProxyPassword.setBorder(new TitledBorder(
         null, Messages.getString(R.string.password), TitledBorder.LEADING,
         TitledBorder.TOP, null, null))
-    char[] proxyPassword = Preferences.instance.proxyPassword
+    var proxyPassword = Preferences.proxyPassword
     mTextProxyPassword.setText(
         if (proxyPassword != null) new String(proxyPassword) else null)
     var gbc_mTextProxyPassword = new GridBagConstraints()
@@ -130,7 +129,7 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
     JEditorPopupMenu.apply(this)
 
     override def store(): Boolean = {
-        Preferences.instance.usingProxy = mChkUseProxy.isSelected()
+        Preferences.usingProxy = mChkUseProxy.isSelected()
         if (mChkUseProxy.isSelected()) {
             /*
              * HOST
@@ -141,7 +140,7 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
                 Dlg.showErrMsgAsync(Messages.getString(R.string.msg_invalid_proxy_host))
                 return false
             }
-            Preferences.instance.proxyHost = mTextProxyHost.getText().trim()
+            Preferences.proxyHost = mTextProxyHost.getText().trim()
 
             /*
              * PORT
@@ -152,20 +151,20 @@ class PanelInternetConnection extends JPanel with PreferencesFrame {
                 Dlg.showErrMsgAsync(Messages.getString(R.string.msg_invalid_proxy_port))
                 return false
             }
-            Preferences.instance.proxyPort = mTextProxyPort.getText().trim().toInt
+            Preferences.proxyPort = mTextProxyPort.getText().trim().toInt
 
             /*
              * USERNAME
              */
-            Preferences.instance.proxyUsername = mTextProxyUsername.getText().trim()
+            Preferences.proxyUsername = mTextProxyUsername.getText().trim()
 
             /*
              * PASSWORD
              */
-            Preferences.instance.proxyPassword = mTextProxyPassword.getPassword()
+            Preferences.proxyPassword = mTextProxyPassword.getPassword()
         }
 
         true
-    }// store()
+    } // store()
 
 }

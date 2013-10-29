@@ -14,10 +14,10 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.io.Reader
-import java.io.Writer
 import java.util.Properties
 import java.util.UUID
+
+import group.pals.desktop.app.apksigner.i18n.Messages
 
 /**
  * Convenient class for storing/ loading preferences.
@@ -29,12 +29,12 @@ object Preferences {
     /**
      * Used for debugging...
      */
-    lazy final val CLASSNAME = classOf[Preferences].getName()
+    lazy final val CLASSNAME = Preferences.getClass().getName()
 
     lazy final val FILE = new File(Sys.appDir().getAbsolutePath()
-            + File.separator + Sys.APP_NAME + ".preferences")
+        + File.separator + Sys.APP_NAME + ".preferences")
     lazy final val mProperties = new Properties()
-    lazy var mTransaction: Properties = null
+    var mTransaction: Properties = null
 
     /*
      * Load preferences from file
@@ -42,14 +42,14 @@ object Preferences {
     L.d("Preferences file = %s", FILE)
     try {
         var reader = new BufferedReader(new InputStreamReader(
-                new FileInputStream(mPropertiesFile), Texts.UTF8));
+            new FileInputStream(FILE), Texts.UTF8));
         try {
             mProperties.load(reader);
         } finally {
             reader.close();
         }
     } catch {
-        case E: Exception =>
+        case e: Exception =>
             L.e("[%s] Error loading preferences: %s", CLASSNAME, e)
     }
 
@@ -66,20 +66,19 @@ object Preferences {
         if (mTransaction == null)
             mTransaction = new Properties()
         this
-    }// beginTransaction()
+    } // beginTransaction()
 
     /**
      * Ends a transaction.
      *
      * @see #beginTransaction()
      */
-    def endTransaction() = synchronized {
-        if (mTransaction == null)
-            return
+    def endTransaction(): Unit = synchronized {
+        if (mTransaction == null) return
 
         mProperties.putAll(mTransaction)
         destroyTransaction()
-    }// endTransaction()
+    } // endTransaction()
 
     /**
      * Cancels a transaction.
@@ -91,29 +90,27 @@ object Preferences {
     /**
      * Destroys the transaction.
      */
-    private def destroyTransaction() = synchronized {
-        if (mTransaction == null)
-            return
+    private def destroyTransaction(): Unit = synchronized {
+        if (mTransaction == null) return
 
         mTransaction.clear()
         mTransaction = null
-    }// destroyTransaction()
+    } // destroyTransaction()
 
     /**
      * Stores all preferences to file.
      */
-    def store() = {
+    def store(): Unit = {
         try {
             var writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(mPropertiesFile), Texts.UTF8));
-            try {
-                mProperties.store(writer, null)
-            } finally { writer.close() }
+                new FileOutputStream(FILE), Texts.UTF8));
+            try mProperties.store(writer, null)
+            finally writer.close()
         } catch {
             case e: Exception =>
                 L.e("[%s] Error storing preferences: %s", CLASSNAME, e)
         }
-    }// store()
+    } // store()
 
     /**
      * Sets a preference.
@@ -135,7 +132,7 @@ object Preferences {
             p.remove(k)
 
         this
-    }// set()
+    } // set()
 
     /**
      * Encrypts and sets a preference.
@@ -151,7 +148,7 @@ object Preferences {
     def xSet(k: String, v: String): this.type =
         set(k,
             if (v != null)
-                SimpleWeakEncryption.encrypt(getUid().toCharArray(), v)
+                SimpleWeakEncryption.encrypt(uid.toCharArray(), v)
             else null)
 
     /**
@@ -161,7 +158,7 @@ object Preferences {
      *            the key name.
      * @return the value of the given key.
      */
-    def get(k: String) = get(k, null)
+    def get(k: String): String = get(k, null)
 
     /**
      * Gets value of a key.
@@ -178,7 +175,7 @@ object Preferences {
             mTransaction.getProperty(k, default)
         else
             mProperties.getProperty(k, default)
-    }// get()
+    } // get()
 
     /**
      * Gets and decrypts value of a key.
@@ -187,7 +184,7 @@ object Preferences {
      *            the key name.
      * @return the value of the given key.
      */
-    def xGet(k: String) = xGet(k, null)
+    def xGet(k: String): String = xGet(k, null)
 
     /**
      * Gets and decrypts value of a key.
@@ -204,8 +201,8 @@ object Preferences {
         if (v == null)
             default
         else
-            SimpleWeakEncryption.decrypt(getUid().toCharArray(), v)
-    }// xGet()
+            SimpleWeakEncryption.decrypt(uid.toCharArray(), v)
+    } // xGet()
 
     /*
      * PREFERENCES
@@ -237,7 +234,7 @@ object Preferences {
         }
 
         res
-    }// uid
+    } // uid
 
     /**
      * Gets JDK path.
@@ -247,7 +244,7 @@ object Preferences {
     def jdkPath: File = {
         var path = get(KEY_JDK_PATH)
         if (path == null) null else new File(path)
-    }// jdkPath()
+    } // jdkPath()
 
     /**
      * Sets the JDK path.
@@ -257,7 +254,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def jdkPath_= (path: File) =
+    def jdkPath_=(path: File) =
         set(KEY_JDK_PATH, if (path != null) path.getAbsolutePath() else null)
 
     /**
@@ -275,7 +272,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def localeTag_= (tag: String) = set(KEY_LOCALE_TAG, tag)
+    def localeTag_=(tag: String) = set(KEY_LOCALE_TAG, tag)
 
     /**
      * Checks if we're using a proxy.
@@ -293,7 +290,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def usingProxy_ = (v: Boolean) = set(KEY_NETWORK_USE_PROXY, v.toString())
+    def usingProxy_=(v: Boolean) = set(KEY_NETWORK_USE_PROXY, v.toString())
 
     /**
      * Gets the proxy host address.
@@ -310,7 +307,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def proxyHost_= (v: String) = set(KEY_NETWORK_PROXY_HOST, v)
+    def proxyHost_=(v: String) = set(KEY_NETWORK_PROXY_HOST, v)
 
     /**
      * Gets the proxy port.
@@ -321,7 +318,7 @@ object Preferences {
         try {
             Integer.parseInt(get(KEY_NETWORK_PROXY_PORT, -1.toString()))
         } catch { case e: Exception => -1 }
-    }// getProxyPort()
+    } // getProxyPort()
 
     /**
      * Sets the proxy port.
@@ -331,7 +328,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def proxyPort_= (v: Int) = set(KEY_NETWORK_PROXY_PORT, v.toString())
+    def proxyPort_=(v: Int) = set(KEY_NETWORK_PROXY_PORT, v.toString())
 
     /**
      * Gets the proxy username.
@@ -348,7 +345,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def proxyUsername_= (v: String) = xSet(KEY_NETWORK_PROXY_USERNAME, v)
+    def proxyUsername_=(v: String) = xSet(KEY_NETWORK_PROXY_USERNAME, v)
 
     /**
      * Gets the proxy password.
@@ -358,7 +355,7 @@ object Preferences {
     def proxyPassword: Array[Char] = {
         var v = xGet(KEY_NETWORK_PROXY_PASSWORD)
         if (v != null) v.toCharArray() else null
-    }// proxyPassword
+    } // proxyPassword
 
     /**
      * Sets the proxy password.
@@ -368,7 +365,7 @@ object Preferences {
      * @return the instance of this object, to allow chaining multiple calls
      *         into a single statement.
      */
-    def proxyPassword_= (v: Array[Char]) =
+    def proxyPassword_=(v: Array[Char]) =
         xSet(KEY_NETWORK_PROXY_PASSWORD, if (v != null) new String(v) else null)
 
 }// Preferences

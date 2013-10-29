@@ -47,7 +47,7 @@ object Hasher {
      *         supported.
      */
     def calcHash(algorithm: String, data: Array[Byte],
-            formatAsFingerprint: Boolean): CharSequence = {
+                 formatAsFingerprint: Boolean): CharSequence = {
         try {
             val md = MessageDigest.getInstance(algorithm)
             md.update(data)
@@ -67,6 +67,6 @@ object Hasher {
                 e.printStackTrace()
                 ""
         }
-    }// calcHash()
+    } // calcHash()
 
 }

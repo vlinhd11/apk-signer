@@ -33,7 +33,7 @@ class SpeedTracker(maxCheckpoints: Int = 500, maxPeriod: Double = 5e9) {
      */
     class CheckPoint(val tick: Double = System.nanoTime(), val speed: Double) {}
 
-    private final val mCheckPoints = List[CheckPoint]()
+    private final var mCheckPoints = List[CheckPoint]()
 
     /**
      * Adds new instantaneous speed.
@@ -42,10 +42,10 @@ class SpeedTracker(maxCheckpoints: Int = 500, maxPeriod: Double = 5e9) {
      *            the instantaneous speed.
      */
     def +(speed: Double) = {
-        mCheckPoints :+= new CheckPoint(speed=speed)
+        mCheckPoints :+= new CheckPoint(speed = speed)
         if (mCheckPoints.size > maxCheckpoints)
             mCheckPoints = mCheckPoints.drop(1)
-    }// +()
+    } // +()
 
     /**
      * Clears all data.
@@ -56,13 +56,13 @@ class SpeedTracker(maxCheckpoints: Int = 500, maxPeriod: Double = 5e9) {
      * Calculates current instantaneous speed, also removes all of old data (old
      * check-points).
      *
-     * @return the current instantaneous speed.
+     * @return the current instantaneous speed, or {@code 0} if an error occurred.
      */
     def calcInstantaneousSpeed(): Double = synchronized {
         var totalSpeed = 0d
 
-        def res() =
-            if (mCheckPoints.isEmpty) 0 else totalSpeed / mCheckPoints.size
+            def res() =
+                if (mCheckPoints.isEmpty) 0 else totalSpeed / mCheckPoints.size
 
         try {
             val tick = System.nanoTime()
@@ -80,6 +80,6 @@ class SpeedTracker(maxCheckpoints: Int = 500, maxPeriod: Double = 5e9) {
         } catch {
             case _: Throwable => 0
         }
-    }// calcInstantaneousSpeed()
+    } // calcInstantaneousSpeed()
 
 }

@@ -79,40 +79,41 @@ object Network {
              * HTTP
              */
             System.setProperty(PROPERTY_SYS_HTTP_PROXY_HOST,
-                    Preferences.proxyHost)
+                Preferences.proxyHost)
             System.setProperty(PROPERTY_SYS_HTTP_PROXY_PORT,
-                    Preferences.proxyPort.toString())
+                Preferences.proxyPort.toString())
 
             /*
              * HTTPS
              */
             System.setProperty(PROPERTY_SYS_HTTPS_PROXY_HOST,
-                    Preferences.proxyHost)
+                Preferences.proxyHost)
             System.setProperty(PROPERTY_SYS_HTTPS_PROXY_PORT,
-                    Preferences.proxyPort.toString())
+                Preferences.proxyPort.toString())
         } else {
-            for (s <- Array(PROPERTY_SYS_HTTP_PROXY_HOST,
+            for (
+                s <- Array(PROPERTY_SYS_HTTP_PROXY_HOST,
                     PROPERTY_SYS_HTTP_PROXY_PORT,
                     PROPERTY_SYS_HTTPS_PROXY_HOST,
-                    PROPERTY_SYS_HTTPS_PROXY_PORT))
-                System.clearProperty(s)
+                    PROPERTY_SYS_HTTPS_PROXY_PORT)
+            ) System.clearProperty(s)
         }
 
         try {
             var conn = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
 
             if (Preferences.usingProxy
-                    && !Texts.isEmpty(Preferences.proxyUsername)) {
+                && !Texts.isEmpty(Preferences.proxyUsername)) {
                 var password = Preferences.proxyPassword
                 var proxyAuthorization =
-                        Base64.encodeToString(
-                            (Preferences.proxyUsername + ":"
-                             + (if (password != null) new String(password) else ""))
+                    Base64.encodeToString(
+                        (Preferences.proxyUsername + ":"
+                            + (if (password != null) new String(password) else ""))
                             .getBytes(Texts.UTF8),
-                            Base64.NO_WRAP)
+                        Base64.NO_WRAP)
                 // https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
                 conn.setRequestProperty("Proxy-Authorization", "Basic "
-                        + proxyAuthorization)
+                    + proxyAuthorization)
             }
 
             conn.setConnectTimeout(NETWORK_TIMEOUT)
@@ -128,10 +129,10 @@ object Network {
                 */
                 e.printStackTrace()
                 null
-            case _: Exception =>
-                _.printStackTrace()
+            case e: Exception =>
+                e.printStackTrace()
                 null
         }
-    }// openHttpConnection()
+    } // openHttpConnection()
 
 }

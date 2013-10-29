@@ -7,17 +7,14 @@
 
 package group.pals.desktop.app.apksigner.utils.ui
 
-import group.pals.desktop.app.apksigner.i18n.Messages
-import group.pals.desktop.app.apksigner.i18n.R
-import group.pals.desktop.app.apksigner.utils.Texts
-
-import java.awt.Component
 import java.awt.Container
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.event.ActionEvent
 
-import javax.swing.Action
+import group.pals.desktop.app.apksigner.i18n.Messages
+import group.pals.desktop.app.apksigner.i18n.R
+import group.pals.desktop.app.apksigner.utils.Texts
 import javax.swing.JMenuItem
 import javax.swing.JPasswordField
 import javax.swing.JPopupMenu
@@ -102,7 +99,7 @@ object JEditorPopupMenu {
     def instance: JEditorPopupMenu = {
         if (_instance == null) _instance = new JEditorPopupMenu()
         _instance
-    }// instance()
+    } // instance()
 
     /**
      * Applies the global instance of this menu to all sub components of
@@ -115,17 +112,17 @@ object JEditorPopupMenu {
      * @param container
      *            the container.
      */
-    def apply(container: Container) = {
+    def apply(container: Container): Unit = {
         for (i <- 0 until container.getComponentCount()) {
             val comp = container.getComponent(i)
             if (comp.isInstanceOf[JTextComponent])
                 comp.asInstanceOf[JTextComponent].setComponentPopupMenu(instance)
             else if (comp.isInstanceOf[Container])
                 apply(comp.asInstanceOf[Container])
-        }// for
-    }// apply()
+        } // for
+    } // apply()
 
-}// JEditorPopupMenu
+} // JEditorPopupMenu
 
 /**
  * Editor popup menu for {@link JTextComponent}.
@@ -164,7 +161,7 @@ class JEditorPopupMenu extends JPopupMenu {
          */
         def isEnabledWith(component: JTextComponent): Boolean
 
-    }// TextActionEx
+    } // TextActionEx
 
     initMenuItems()
 
@@ -184,15 +181,15 @@ class JEditorPopupMenu extends JPopupMenu {
             Messages.getString(R.string.context_menu_delete),
             itemSeparator,
             Messages.getString(R.string.context_menu_select_all))
-        val itemActions =Array(
-            new CutAction(itemTitles[0]),
-            new CopyAction(itemTitles[1]),
-            new CopyAllAction(itemTitles[2]),
-            new PasteAction(itemTitles[3]), null,
-            new ClearAndPasteAction(itemTitles[4]),
-            new ClearAction(itemTitles[5]),
-            new DeleteAction(itemTitles[6]), null,
-            new SelectAllAction(itemTitles[7]))
+        val itemActions = Array(
+            new CutAction(itemTitles(0)),
+            new CopyAction(itemTitles(1)),
+            new CopyAllAction(itemTitles(2)),
+            new PasteAction(itemTitles(3)), null,
+            new ClearAndPasteAction(itemTitles(4)),
+            new ClearAction(itemTitles(5)),
+            new DeleteAction(itemTitles(6)), null,
+            new SelectAllAction(itemTitles(7)))
         for (i <- 0 until itemTitles.length) {
             if (itemTitles(i).equals(itemSeparator)) {
                 add(new JPopupMenu.Separator())
@@ -203,8 +200,8 @@ class JEditorPopupMenu extends JPopupMenu {
                 menuItem.setToolTipText(itemTitles(i))
                 add(menuItem)
             }
-        }// for
-    }// initMenuItems()
+        } // for
+    } // initMenuItems()
 
     /**
      * Fires an action... (TODO ???)
@@ -216,7 +213,7 @@ class JEditorPopupMenu extends JPopupMenu {
         var invoker = getInvoker()
         if (invoker != null)
             invoker.firePropertyChange(actionName, 0, 1)
-    }// fireAfterActionPerformed()
+    } // fireAfterActionPerformed()
 
     /*
      * EDITOR ACTIONS
@@ -235,7 +232,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -249,14 +246,14 @@ class JEditorPopupMenu extends JPopupMenu {
                 }
             }
 
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean =
-            !component.isInstanceOf[JPasswordField]
-                && component.isEnabled() && component.isEditable()
-                && !Texts.isEmpty(component.getSelectedText())
+            !component.isInstanceOf[JPasswordField] &&
+                component.isEnabled() && component.isEditable() &&
+                !Texts.isEmpty(component.getSelectedText())
 
-    }// CutAction
+    } // CutAction
 
     /**
      * The COPY action.
@@ -271,7 +268,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -284,13 +281,13 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean =
-            !component.isInstanceOf[JPasswordField] && component.isEnabled()
-                && !Texts.isEmpty(component.getSelectedText())
+            !component.isInstanceOf[JPasswordField] && component.isEnabled() &&
+                !Texts.isEmpty(component.getSelectedText())
 
-    }// CopyAction
+    } // CopyAction
 
     /**
      * The COPY ALL action.
@@ -305,7 +302,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -319,13 +316,13 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent) =
-            !component.isInstanceOf[JPasswordField] && component.isEnabled()
-                && !Texts.isEmpty(component.getText())
+            !component.isInstanceOf[JPasswordField] && component.isEnabled() &&
+                !Texts.isEmpty(component.getText())
 
-    }// CopyAllAction
+    } // CopyAllAction
 
     /**
      * PASTE action.
@@ -342,7 +339,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -355,7 +352,7 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean = {
             if (component.isEnabled() && component.isEditable()) {
@@ -369,9 +366,9 @@ class JEditorPopupMenu extends JPopupMenu {
 
                 !Texts.isEmpty(clipboard)
             } else false
-        }// isEnabledWith()
+        } // isEnabledWith()
 
-    }// PasteAction
+    } // PasteAction
 
     /**
      * CLEAR action.
@@ -388,7 +385,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -401,13 +398,13 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean =
-            component.isEnabled() && component.isEditable()
-                && !Texts.isEmpty(component.getText())
+            component.isEnabled() && component.isEditable() &&
+                !Texts.isEmpty(component.getText())
 
-    }// ClearAction
+    } // ClearAction
 
     /**
      * DELETE action.
@@ -421,10 +418,10 @@ class JEditorPopupMenu extends JPopupMenu {
          */
         private lazy final val serialVersionUID = 7226805445589511342L
 
-        override def actionPerformed(e: ActionEvent) = {
+        override def actionPerformed(e: ActionEvent): Unit = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -450,13 +447,13 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean =
-            component.isEnabled() && component.isEditable()
-                && !Texts.isEmpty(component.getSelectedText())
+            component.isEnabled() && component.isEditable() &&
+                !Texts.isEmpty(component.getSelectedText())
 
-    }// DeleteAction
+    } // DeleteAction
 
     /**
      * CLEAR AND PASTE action.
@@ -473,7 +470,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -487,12 +484,12 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean =
             component.isEnabled() && component.isEditable()
 
-    }// ClearAndPasteAction
+    } // ClearAndPasteAction
 
     /**
      * SELECT ALL action.
@@ -509,7 +506,7 @@ class JEditorPopupMenu extends JPopupMenu {
         override def actionPerformed(e: ActionEvent) = {
             if (e.getSource().isInstanceOf[JMenuItem]) {
                 if (e.getSource().asInstanceOf[JMenuItem].getParent()
-                        .isInstanceOf[JPopupMenu]) {
+                    .isInstanceOf[JPopupMenu]) {
                     var popupMenu = e.getSource().asInstanceOf[JMenuItem]
                         .getParent().asInstanceOf[JPopupMenu]
                     if (popupMenu.getInvoker().isInstanceOf[JTextComponent]) {
@@ -522,12 +519,12 @@ class JEditorPopupMenu extends JPopupMenu {
                     }
                 }
             }
-        }// actionPerformed()
+        } // actionPerformed()
 
         override def isEnabledWith(component: JTextComponent): Boolean =
             component.isEnabled() && !Texts.isEmpty(component.getText())
 
-    }// SelectAllAction()
+    } // SelectAllAction()
 
     override protected def firePopupMenuWillBecomeVisible() = {
         /*
@@ -544,8 +541,8 @@ class JEditorPopupMenu extends JPopupMenu {
                     action.setEnabled(
                         action.isEnabledWith(invoker.asInstanceOf[JTextComponent]))
                 }
-            }// for
-        }// if
-    }// firePopupMenuWillBecomeVisible()
+            } // for
+        } // if
+    } // firePopupMenuWillBecomeVisible()
 
 }

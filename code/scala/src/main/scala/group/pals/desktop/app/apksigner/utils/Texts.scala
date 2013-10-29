@@ -81,14 +81,14 @@ object Texts {
         val units = Array("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi")
         val blockSize = 1024
 
-        var digitGroups = (int) (Math.log10(size) / Math.log10(blockSize))
+        var digitGroups = (Math.log10(size) / Math.log10(blockSize)).asInstanceOf[Int]
         if (digitGroups >= units.length)
             digitGroups = units.length - 1
-        size = size / Math.pow(blockSize, digitGroups)
+        var _size = size / Math.pow(blockSize, digitGroups)
 
         "%s %%sB".format(if (digitGroups == 0) "%,.0f" else "%,.2f").format(
-            size, units[digitGroups])
-    }// sizeToStr()
+            _size, units(digitGroups))
+    } // sizeToStr()
 
     /**
      * Converts a percentage to string.
@@ -96,7 +96,7 @@ object Texts {
      * @param percent
      * @return
      */
-    def percentToStr(percent: Float) = percentToStr((double) percent)
+    def percentToStr(percent: Float): String = percentToStr(percent.asInstanceOf[Double])
 
     /**
      * Converts a percentage to string.
@@ -104,14 +104,14 @@ object Texts {
      * @param percent
      * @return
      */
-    def percentToStr(percent Double): String = {
+    def percentToStr(percent: Double): String = {
         if (percent == 0)
             "0%"
         else if (percent < 100)
             "%02.02f%%".format(percent)
         else
             "100%"
-    }// percentToStr()
+    } // percentToStr()
 
     /**
      * Checks whether {@code s} is empty or {@code null}.

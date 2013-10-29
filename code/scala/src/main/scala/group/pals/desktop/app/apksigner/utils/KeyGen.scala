@@ -51,9 +51,9 @@ object KeyGen {
      *             if any occurred.
      */
     def genKey(jdkPath: File, target: File, storepass: Array[Char],
-            alias: String, keypass: Array[Char], aliasYears: Int, coName: String,
-            ouName: String, oName: String, city: String, state: String,
-            country: String) {
+               alias: String, keypass: Array[Char], aliasYears: Int, coName: String,
+               ouName: String, oName: String, city: String, state: String,
+               country: String) {
         target.delete()
 
         /*
@@ -67,8 +67,8 @@ object KeyGen {
         var keys = Array("CN", "OU", "O", "L", "S", "C")
         var dname = ""
         for (i <- 0 until values.length) {
-            if (!Texts.isEmpty(values[i]))
-                dname += "%s=%s ".format(keys[i], values[i])
+            if (!Texts.isEmpty(values(i)))
+                dname += "%s=%s ".format(keys(i), values(i))
         }
         dname = dname.trim()
 
@@ -80,13 +80,13 @@ object KeyGen {
                 jdkPath.getAbsolutePath() + File.separator + "keytool.exe"
             else "keytool"
 
-        var pb = new ProcessBuilder(Array(
-                keytool,
-                "-genkey", "-keyalg", "RSA", "-alias", alias, "-keypass",
-                new String(keypass), "-validity", aliasYears.toString(),
-                "-keystore", target.getAbsolutePath(), "-storepass",
-                new String(storepass), "-genkeypair", "-dname",
-                "%s".format(dname)))
+        var pb = new ProcessBuilder(
+            keytool,
+            "-genkey", "-keyalg", "RSA", "-alias", alias, "-keypass",
+            new String(keypass), "-validity", aliasYears.toString(),
+            "-keystore", target.getAbsolutePath(), "-storepass",
+            new String(storepass), "-genkeypair", "-dname",
+            "%s".format(dname))
         var p = pb.start()
 
         var sb = new StringBuffer()
@@ -109,6 +109,6 @@ object KeyGen {
 
         if (!target.isFile())
             throw new IOException("Error: " + sb)
-    }// genKey()
+    } // genKey()
 
 }

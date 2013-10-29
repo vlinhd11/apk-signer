@@ -166,6 +166,6 @@ object R {
         lazy final val warning = 0x00000089
         lazy final val yes = 0x0000008a
 
-    }// string
+    } // string
 
 }

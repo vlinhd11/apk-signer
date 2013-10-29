@@ -7,15 +7,17 @@
 
 package group.pals.desktop.app.apksigner.utils
 
-import group.pals.desktop.app.apksigner.i18n.Messages
-import group.pals.desktop.app.apksigner.i18n.R
-import group.pals.desktop.app.apksigner.utils.ui.Dlg
-
 import java.awt.event.KeyEvent
 import java.io.File
 import java.util.regex.Pattern
 
+import group.pals.desktop.app.apksigner.i18n.Messages
+import group.pals.desktop.app.apksigner.i18n.R
+import group.pals.desktop.app.apksigner.utils.ui.Dlg
 import javax.swing.JFileChooser
+import javax.swing.JFileChooser.DIRECTORIES_ONLY
+import javax.swing.JFileChooser.OPEN_DIALOG
+import javax.swing.JFileChooser.SAVE_DIALOG
 import javax.swing.JOptionPane
 import javax.swing.filechooser.FileFilter
 
@@ -58,12 +60,13 @@ object Files {
     def appendFilename(fileName: String, suffix: String): String = {
         if (fileName.matches("(?si).+\\.[^ \t]+")) {
             val iPeriod = fileName.lastIndexOf(KeyEvent.VK_PERIOD)
-            return fileName.substring(0, iPeriod) + suffix
-                + (char) KeyEvent.VK_PERIOD + fileName.substring(iPeriod + 1)
+            return fileName.substring(0, iPeriod) + suffix +
+                KeyEvent.VK_PERIOD.asInstanceOf[Char] +
+                fileName.substring(iPeriod + 1)
         }
 
         fileName + suffix
-    }// appendFilename()
+    } // appendFilename()
 
     /**
      * Opens a dialog to choose a file.
@@ -72,16 +75,16 @@ object Files {
      *            the startup directory.
      * @return the chosen file, or {@code null} if the user cancelled.
      */
-    def chooseFile(startupDir File): File = {
+    def chooseFile(startupDir: File): File = {
         val fc = new JFileChooserEx(startupDir)
         fc.setDialogTitle(Messages.getString(R.string.choose_file))
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY)
 
         fc.showOpenDialog(null) match {
-        case JFileChooser.APPROVE_OPTION => return fc.getSelectedFile()
-        case _ => null
+            case JFileChooser.APPROVE_OPTION => return fc.getSelectedFile()
+            case _ => null
         }
-    }// chooseFile()
+    } // chooseFile()
 
     /**
      * Opens a dialog to choose a file.
@@ -94,18 +97,18 @@ object Files {
      *            the file filter description.
      * @return the chosen file, can be {@code null}.
      */
-    def chooseFile(startupDir File, regexFilenameFilter: String,
-            description: String): File = {
+    def chooseFile(startupDir: File, regexFilenameFilter: String,
+                   description: String): File = {
         val fc = new JFileChooserEx(startupDir)
         fc.setDialogTitle(Messages.getString(R.string.choose_file))
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY)
         fc.addFilenameFilter(regexFilenameFilter, description, true)
 
         fc.showOpenDialog(null) match {
-        case JFileChooser.APPROVE_OPTION => fc.getSelectedFile()
-        case _ => null
+            case JFileChooser.APPROVE_OPTION => fc.getSelectedFile()
+            case _ => null
         }
-    }// chooseFile()
+    } // chooseFile()
 
     /**
      * Opens a dialog to choose a directory.
@@ -114,16 +117,16 @@ object Files {
      *            the startup directory.
      * @return the chosen directory, can be {@code null}.
      */
-    def chooseDir(startupDir File): File = {
+    def chooseDir(startupDir: File): File = {
         val fc = new JFileChooserEx(startupDir)
         fc.setDialogTitle(Messages.getString(R.string.choose_directory))
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
 
         fc.showOpenDialog(null) match {
-        case JFileChooser.APPROVE_OPTION => fc.getSelectedFile()
-        case _ => null
+            case JFileChooser.APPROVE_OPTION => fc.getSelectedFile()
+            case _ => null
         }
-    }// chooseDir()
+    } // chooseDir()
 
     /**
      * Opens a dialog to choose a file to save.
@@ -132,7 +135,7 @@ object Files {
      *            the startup directory.
      * @return the chosen file, can be {@code null}.
      */
-    def chooseFileToSave(startupDir File) =
+    def chooseFileToSave(startupDir: File): Unit =
         chooseFileToSave(startupDir, null, null, null)
 
     /**
@@ -148,8 +151,8 @@ object Files {
      *            the file filter description.
      * @return the chosen file, can be {@code null}.
      */
-    def chooseFileToSave(startupDir File, defaultFileExt: String,
-            regexFilenameFilter: String, description: String): File = {
+    def chooseFileToSave(startupDir: File, defaultFileExt: String,
+                         regexFilenameFilter: String, description: String): File = {
         val fc = new JFileChooserEx(startupDir)
         fc.setDialogTitle(Messages.getString(R.string.save_as))
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY)
@@ -158,10 +161,10 @@ object Files {
             fc.addFilenameFilter(regexFilenameFilter, description, true)
 
         fc.showSaveDialog(null) match {
-        case JFileChooser.APPROVE_OPTION => fc.getSelectedFile()
-        case _ => null
+            case JFileChooser.APPROVE_OPTION => fc.getSelectedFile()
+            case _ => null
         }
-    }// chooseFileToSave()
+    } // chooseFileToSave()
 
     /**
      * Creates new file filter.
@@ -177,7 +180,7 @@ object Files {
      * @return the {@link FileFilter} object.
      */
     def newFileFilter(fileSelectionMode: Int, regex: String,
-            description: String): FileFilter = {
+                      description: String): FileFilter = {
         new FileFilter() {
 
             @Override
@@ -188,134 +191,135 @@ object Files {
                     true
                 else
                     f.getName().matches(regex)
-            }// accept()
+            } // accept()
 
             @Override
             def getDescription() = description
         }
-    }// newFileFilter()
+    } // newFileFilter()
+
+}
+
+/**
+ * Extended class of {@link JFileChooser}, which hacks some methods :-)
+ */
+class JFileChooserEx(startupDir: File) extends JFileChooser(startupDir) {
+
+    import JFileChooser._
 
     /**
-     * Extended class of {@link JFileChooser}, which hacks some methods :-)
+     * Auto-generated by Eclipse.
      */
-    class JFileChooserEx(val startupDir: File) extends
-            JFileChooser(startupDir) {
+    lazy final val serialVersionUID = -8249130783203341207L
 
-        /**
-         * Auto-generated by Eclipse.
-         */
-        lazy final val serialVersionUID = -8249130783203341207L
+    private var mDefaultFileExt: String = null
 
-        private var mDefaultFileExt: String = null
+    /**
+     * Adds the regex file name filter.
+     *
+     * @param regex
+     *            the regular expression.
+     * @param description
+     *            the description.
+     * @return the {@link FileFilter}.
+     */
+    def addFilenameFilter(regex: String, description: String): Unit =
+        addFilenameFilter(regex, description, false)
 
-        /**
-         * Adds the regex file name filter.
-         *
-         * @param regex
-         *            the regular expression.
-         * @param description
-         *            the description.
-         * @return the {@link FileFilter}.
-         */
-        def addFilenameFilter(regex: String, description: String) =
-            addFilenameFilter(regex, description, false)
+    /**
+     * Adds the regex file name filter.
+     *
+     * @param regex
+     *            the regular expression.
+     * @param description
+     *            the description.
+     * @param setAsMainFilter
+     *            {@code true} if you want to set the main filter to this
+     *            one.
+     * @return the {@link FileFilter}.
+     */
+    def addFilenameFilter(regex: String, description: String,
+                          setAsMainFilter: Boolean) = {
+        new FileFilter() {
 
-        /**
-         * Adds the regex file name filter.
-         *
-         * @param regex
-         *            the regular expression.
-         * @param description
-         *            the description.
-         * @param setAsMainFilter
-         *            {@code true} if you want to set the main filter to this
-         *            one.
-         * @return the {@link FileFilter}.
-         */
-        def addFilenameFilter(regex: String, description: String,
-                setAsMainFilter: Boolean) = {
-            new FileFilter() {
+            addChoosableFileFilter(this)
+            if (setAsMainFilter)
+                setFileFilter(this)
 
-                addChoosableFileFilter(this)
-                if (setAsMainFilter)
-                    setFileFilter(this)
+            override def accept(f: File): Boolean = {
+                if (getFileSelectionMode() == DIRECTORIES_ONLY)
+                    f.getName().matches(regex)
+                else if (f.isDirectory())
+                    true
+                else
+                    f.getName().matches(regex)
+            } // accept()
 
-                override def accept(f: File): Boolean = {
-                    if (getFileSelectionMode() == DIRECTORIES_ONLY)
-                        f.getName().matches(regex)
-                    else if (f.isDirectory())
-                        true
-                    else
-                        f.getName().matches(regex)
-                }// accept()
+            override def getDescription() = description
 
-                override def getDescription() = description
+        }
+    } // addFilenameFilter()
 
-            }
-        }// addFilenameFilter()
+    /**
+     * Sets default file extension in {@link #SAVE_DIALOG} mode.
+     *
+     * @param fileExt
+     *            the default file extension to set.
+     * @return the instance of this class, to allow chaining multiple calls
+     *         into a single statement.
+     */
+    def setDefaultFileExt(fileExt: String): this.type = {
+        mDefaultFileExt = fileExt
+        this
+    } // setDefaultFileExt()
 
-        /**
-         * Sets default file extension in {@link #SAVE_DIALOG} mode.
-         *
-         * @param fileExt
-         *            the default file extension to set.
-         * @return the instance of this class, to allow chaining multiple calls
-         *         into a single statement.
-         */
-        def setDefaultFileExt(fileExt: String): this.type = {
-            mDefaultFileExt = fileExt
-            this
-        }// setDefaultFileExt()
-
-        override def approveSelection() = {
-            getDialogType() match {
+    override def approveSelection(): Unit = {
+        getDialogType() match {
             case SAVE_DIALOG => {
                 if (getCurrentDirectory() == null
-                        || !getCurrentDirectory().canWrite()) {
+                    || !getCurrentDirectory().canWrite()) {
                     Dlg.showErrMsg(Messages
-                            .getString(R.string.msg_cannot_save_a_file_here))
+                        .getString(R.string.msg_cannot_save_a_file_here))
                     return
                 }
 
                 var file = getSelectedFile()
                 if (file != null && mDefaultFileExt != null) {
                     if (!file.getName().matches(
-                            "(?si).+" + Pattern.quote(mDefaultFileExt))) {
+                        "(?si).+" + Pattern.quote(mDefaultFileExt))) {
                         file = new File(file.getParent() + File.separator
-                                + file.getName() + mDefaultFileExt)
+                            + file.getName() + mDefaultFileExt)
                         setSelectedFile(file)
                     }
                 }
                 if ((file != null) && file.exists()) {
-                    val userOptions = Array(
-                            Messages.getString(R.string.yes),
-                            Messages.getString(R.string.no) )
+                    val userOptions = Array[Object](
+                        Messages.getString(R.string.yes),
+                        Messages.getString(R.string.no))
                     val usrOption = JOptionPane.showOptionDialog(this, Messages
-                            .getString(R.string.pmsg_override_file,
-                                    file.getName()), Messages
-                            .getString(R.string.confirmation),
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, userOptions,
-                            userOptions[1])
+                        .getString(R.string.pmsg_override_file,
+                            file.getName()), Messages
+                        .getString(R.string.confirmation),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, userOptions,
+                        userOptions(1))
                     if (usrOption != 0)
                         return
                 }
-            }// case SAVE_DIALOG
+            } // case SAVE_DIALOG
 
             case OPEN_DIALOG => {
                 var file = getSelectedFile()
                 if (file == null || !file.exists()) {
                     Dlg.showErrMsg(Messages.getString(
-                            R.string.pmsg_file_not_exist, file == null ? ""
-                                    : file.getName()))
+                        R.string.pmsg_file_not_exist,
+                        if (file == null) "" else file.getName()))
                     return
                 }
-            }// case OPEN_DIALOG
-            }
+            } // case OPEN_DIALOG
+        }
 
-            super.approveSelection()
-        }// approveSelection()
+        super.approveSelection()
+    } // approveSelection()
 
-    }// JFileChooserEx
-
-}
+}// JFileChooserEx

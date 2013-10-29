@@ -43,7 +43,7 @@ object Sys {
     def appJar(): File = {
         new File(Sys.getClass().getProtectionDomain().getCodeSource()
             .getLocation().toString())
-    }// appJar()
+    } // appJar()
 
     /**
      * Gets app root directory.

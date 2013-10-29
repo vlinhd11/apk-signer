@@ -8,16 +8,13 @@
 package group.pals.desktop.app.apksigner.utils
 
 import java.security.Key
-import java.security.spec.KeySpec
 
+import android.util.Base64
 import javax.crypto.Cipher
-import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-
-import android.util.Base64
 
 /**
  * The <b>simple-and-weak</b> encryption utilities.
@@ -36,7 +33,7 @@ object SimpleWeakEncryption {
      * tools to be installed. Poor Java :|
      */
     private lazy final val KEY_LEN = 128
-    private lazy final val ITERATION_COUNT = (int) Math.pow(2, 16)
+    private lazy final val ITERATION_COUNT = Math.pow(2, 16).asInstanceOf[Int]
     private lazy final val SEPARATOR = "\t"
     private lazy final val DEFAULT_BASE64_FLAGS = Base64.NO_WRAP
 
@@ -55,11 +52,11 @@ object SimpleWeakEncryption {
         var cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, genKey(password))
 
-        Base64.encodeToString(cipher.getIV(), DEFAULT_BASE64_FLAGS)
-            + SEPARATOR
-            + Base64.encodeToString(
-                cipher.doFinal(data.getBytes(UTF8)), DEFAULT_BASE64_FLAGS))
-    }// encrypt()
+        Base64.encodeToString(cipher.getIV(), DEFAULT_BASE64_FLAGS) +
+            SEPARATOR +
+            Base64.encodeToString(
+                cipher.doFinal(data.getBytes(UTF8)), DEFAULT_BASE64_FLAGS)
+    } // encrypt()
 
     /**
      * Decrypts an encrypted string ({@code data}) by {@code key}.
@@ -80,7 +77,7 @@ object SimpleWeakEncryption {
             cipher.doFinal(Base64.decode(
                 data.substring(iSeparator + 1), DEFAULT_BASE64_FLAGS)),
             UTF8)
-    }// decrypt()
+    } // decrypt()
 
     /**
      * Generates secret key.
@@ -97,6 +94,6 @@ object SimpleWeakEncryption {
         new SecretKeySpec(
             factory.generateSecret(spec).getEncoded(),
             SECRET_KEY_SPEC_ALGORITHM)
-    }// genKey()
+    } // genKey()
 
 }

@@ -7,19 +7,14 @@
 
 package group.pals.desktop.app.apksigner.utils
 
-import group.pals.desktop.app.apksigner.i18n.Messages
-import group.pals.desktop.app.apksigner.i18n.R
-
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.io.InputStream
 import java.security.KeyStore
-import java.security.cert.Certificate
 import java.security.cert.X509Certificate
-import java.util.ArrayList
-import java.util.Enumeration
-import java.util.List
+
+import group.pals.desktop.app.apksigner.i18n.Messages
+import group.pals.desktop.app.apksigner.i18n.R
 
 /**
  * Utilities for keystore files.
@@ -62,7 +57,7 @@ object KeyTools {
      */
     @deprecated
     def listEntries(jdkPath: File, keyFile: File,
-            storepass: Array[Char]): CharSequence = {
+                    storepass: Array[Char]): CharSequence = {
         /*
          * JDK for Linux does not need to specify full path.
          */
@@ -76,10 +71,10 @@ object KeyTools {
         /*
          * keytool -list -v -keystore aaa.keystore -storepass XXX
          */
-        var pb = new ProcessBuilder(Array(
-                keytool, "-list",
-                "-v", "-keystore", keyFile.getAbsolutePath(), "-storepass",
-                new String(storepass)))
+        var pb = new ProcessBuilder(
+            keytool, "-list",
+            "-v", "-keystore", keyFile.getAbsolutePath(), "-storepass",
+            new String(storepass))
         try {
             var p = pb.start()
 
@@ -106,7 +101,7 @@ object KeyTools {
         }
 
         console
-    }// listEntries()
+    } // listEntries()
 
     /**
      * Lists entries in a keystore file.
@@ -120,12 +115,12 @@ object KeyTools {
      * @return the information, never be {@code null}.
      */
     def listEntries(keyFile: File, keystoreType: String,
-            storepass: Array[Char]): CharSequence = {
+                    storepass: Array[Char]): CharSequence = {
         val result = new StringBuilder()
 
         try {
             val inputStream = new BufferedInputStream(
-                    new FileInputStream(keyFile), Files.FILE_BUFFER)
+                new FileInputStream(keyFile), Files.FILE_BUFFER)
             try {
                 var keyStore = KeyStore.getInstance(keystoreType)
                 keyStore.load(inputStream, storepass)
@@ -135,22 +130,22 @@ object KeyTools {
                  */
 
                 result.append("%s: %s\n".format(
-                        Messages.getString(R.string.keystore_type),
-                        keyStore.getType()))
+                    Messages.getString(R.string.keystore_type),
+                    keyStore.getType()))
                 result.append("%s: %s\n".format(
-                        Messages.getString(R.string.keystore_provider),
-                        keyStore.getProvider()))
+                    Messages.getString(R.string.keystore_provider),
+                    keyStore.getProvider()))
                 result.append("\n")
 
                 val entryCount = keyStore.size()
                 if (entryCount <= 1)
                     result.append(Messages.getString(
-                            R.string.pmsg_your_keystore_contains_x_entry,
-                            entryCount))
+                        R.string.pmsg_your_keystore_contains_x_entry,
+                        entryCount))
                 else
                     result.append(Messages.getString(
-                            R.string.pmsg_your_keystore_contains_x_entries,
-                            entryCount))
+                        R.string.pmsg_your_keystore_contains_x_entries,
+                        entryCount))
                 result.append("\n\n")
 
                 /*
@@ -163,62 +158,64 @@ object KeyTools {
                     val cert = keyStore.getCertificate(alias)
 
                     result.append("%s: %s\n".format(
-                            Messages.getString(R.string.alias_name), alias))
+                        Messages.getString(R.string.alias_name), alias))
                     result.append("%s: %s\n".format(
-                            Messages.getString(R.string.creation_date),
-                            keyStore.getCreationDate(alias)))
+                        Messages.getString(R.string.creation_date),
+                        keyStore.getCreationDate(alias)))
                     result.append("%s: %s\n".format(
-                            Messages.getString(R.string.entry_type),
-                            cert.getType()))
+                        Messages.getString(R.string.entry_type),
+                        cert.getType()))
 
                     val certChain = keyStore.getCertificateChain(alias)
                     if (certChain != null) {
                         result.append("%s: %,d\n".format(Messages
-                                .getString(R.string.certificate_chain_length),
-                                certChain.length))
+                            .getString(R.string.certificate_chain_length),
+                            certChain.length))
                         for (i <- 0 until certChain.length) {
                             result.append("\t%s[%,d]:\n".format(
-                                    Messages.getString(R.string.certificate),
-                                    i + 1))
+                                Messages.getString(R.string.certificate),
+                                i + 1))
 
-                            if (certChain[i].isInstanceOf[X509Certificate]) {
-                                var x509Cert = certChain[i].asInstanceOf[X509Certificate]
+                            if (certChain(i).isInstanceOf[X509Certificate]) {
+                                var x509Cert = certChain(i).asInstanceOf[X509Certificate]
 
                                 result.append("\t\t%s: %s\n".format(
-                                        Messages.getString(R.string.owner),
-                                        x509Cert.getIssuerX500Principal()
-                                                .getName()))
+                                    Messages.getString(R.string.owner),
+                                    x509Cert.getIssuerX500Principal()
+                                        .getName()))
                                 result.append("\t\t%s: %s\n".format(
-                                        Messages.getString(R.string.issuer),
-                                        x509Cert.getIssuerX500Principal()
-                                                .getName()))
+                                    Messages.getString(R.string.issuer),
+                                    x509Cert.getIssuerX500Principal()
+                                        .getName()))
                                 result.append(
-                                        "\t\t%s: %x\n".format(
+                                    "\t\t%s: %x\n".format(
                                         Messages.getString(R.string.serial_number),
                                         x509Cert.getSerialNumber()))
                                 result.append("\t\t")
-                                        .append(Messages.getString(
-                                                R.string.pmsg_valid_from_until,
-                                                x509Cert.getNotBefore(),
-                                                x509Cert.getNotAfter()))
-                                        .append('\n')
-                            }// if
+                                    .append(Messages.getString(
+                                        R.string.pmsg_valid_from_until,
+                                        x509Cert.getNotBefore(),
+                                        x509Cert.getNotAfter()))
+                                    .append('\n')
+                            } // if
 
                             result.append(
-                                    "\t\t%s:\n".format(
+                                "\t\t%s:\n".format(
                                     Messages.getString(R.string.certificate_fingerprints)))
-                            for (algorithm <- Array(Hasher.MD5, Hasher.SHA1,
-                                    Hasher.SHA256)) {
+                            for (
+                                algorithm <- Array(Hasher.MD5, Hasher.SHA1,
+                                    Hasher.SHA256)
+                            ) {
                                 var hash = Hasher
-                                        .calcHash(algorithm,
-                                                certChain[i].getEncoded(), true)
-                                        .toString().toUpperCase()
+                                    .calcHash(algorithm,
+                                        certChain(i).getEncoded(), true)
+                                    .toString().toUpperCase()
                                 result.append("\t\t\t%s: %s\n".format(
-                                        algorithm, hash))
+                                    algorithm, hash))
                             }
                         }
                     }
-                }// while
+                } // while
             } finally {
                 inputStream.close()
             }
@@ -227,7 +224,7 @@ object KeyTools {
         }
 
         result
-    }// listEntries()
+    } // listEntries()
 
     /**
      * Gets all alias names from {@code keyFile}.
@@ -241,19 +238,19 @@ object KeyTools {
      * @return list of alias names, can be empty.
      */
     def getAliases(keyFile: File, keystoreType: String,
-            storepass: Array[Char]): List[String] = {
-        val result = List[String]()
+                   storepass: Array[Char]): List[String] = {
+        var result = List[String]()
 
         try {
             val inputStream = new BufferedInputStream(
-                    new FileInputStream(keyFile), Files.FILE_BUFFER)
+                new FileInputStream(keyFile), Files.FILE_BUFFER)
             try {
                 var keyStore = KeyStore.getInstance(keystoreType)
                 keyStore.load(inputStream, storepass)
 
                 var aliases = keyStore.aliases()
                 while (aliases.hasMoreElements())
-                    result.add(aliases.nextElement())
+                    result :+= aliases.nextElement()
             } finally {
                 inputStream.close()
             }
@@ -265,6 +262,6 @@ object KeyTools {
         }
 
         result
-    }// getAliases()
+    } // getAliases()
 
 }

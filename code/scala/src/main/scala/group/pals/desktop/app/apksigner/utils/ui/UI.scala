@@ -8,14 +8,12 @@
 package group.pals.desktop.app.apksigner.utils.ui
 
 import java.awt.Color
-import java.awt.Component
 import java.awt.Rectangle
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 
 import javax.swing.BorderFactory
 import javax.swing.JTabbedPane
-import javax.swing.border.Border
 
 /**
  * UI utilities.
@@ -65,7 +63,7 @@ object UI {
      * @param luckyNo
      *            your lucky number :-)
      */
-    def setWindowCenterScreen(window: java.awt.Window, luckyNo: Int) =
+    def setWindowCenterScreen(window: java.awt.Window, luckyNo: Int): Unit =
         setWindowCenterScreen(window, luckyNo * 16, luckyNo * 9)
 
     /**
@@ -80,13 +78,13 @@ object UI {
      *            the window height.
      */
     def setWindowCenterScreen(window: java.awt.Window, width: Int,
-            height: Int) = {
+                              height: Int): Unit = {
         var dim = new java.awt.Dimension(width, height)
         window.setMinimumSize(dim)
         window.setSize(dim)
 
         setWindowCenterScreen(window)
-    }// setWindowCenterScreen()
+    } // setWindowCenterScreen()
 
     /**
      * Moves the {@code window} to center of the screen, also resizes it by
@@ -104,7 +102,7 @@ object UI {
         window.setLocation(
             (dim.width - window.getWidth()) / 2,
             (dim.height - window.getHeight()) / 2)
-    }// setWindowCenterScreen()
+    } // setWindowCenterScreen()
 
     /**
      * Initializes a tabbed pane to listen to mouse wheel events, and switch
@@ -113,16 +111,16 @@ object UI {
      * @param tabbedPane
      *            the tabbed pane.
      */
-    def initJTabbedPaneHeaderMouseWheelListener(tabbedPane: JTabbedPane) = {
+    def initJTabbedPaneHeaderMouseWheelListener(tabbedPane: JTabbedPane): Unit = {
         tabbedPane.addMouseWheelListener(new MouseWheelListener() {
 
-            override def mouseWheelMoved(e: MouseWheelEvent) = {
+            override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
                 val selectedComp = tabbedPane.getSelectedComponent()
                 if (selectedComp == null) return
 
                 val headerHeight = tabbedPane.getHeight() - selectedComp.getHeight()
                 if (!new Rectangle(0, 0, tabbedPane.getWidth(), headerHeight)
-                        .contains(e.getPoint()))
+                    .contains(e.getPoint()))
                     return
 
                 val tabIndex = tabbedPane.getSelectedIndex()
@@ -134,9 +132,9 @@ object UI {
                     if (tabIndex > 0)
                         tabbedPane.setSelectedIndex(tabIndex - 1)
                 }
-            }// mouseWheelMoved()
+            } // mouseWheelMoved()
 
         })
-    }// initJTabbedPaneHeaderMouseWheelListener()
+    } // initJTabbedPaneHeaderMouseWheelListener()
 
 }

@@ -7,19 +7,15 @@
 
 package group.pals.desktop.app.apksigner.i18n
 
-import group.pals.desktop.app.apksigner.utils.Preferences
-
-import java.beans.Beans
-import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.util.HashMap
 import java.util.Locale
-import java.util.Map
 import java.util.MissingResourceException
 import java.util.ResourceBundle
 
 import scala.collection.mutable.LinkedHashMap
 import scala.collection.mutable.Map
+
+import group.pals.desktop.app.apksigner.utils.Preferences
 
 /**
  * Manager for i18n strings.
@@ -52,13 +48,13 @@ object Messages {
      * @return the resource bundle which contains message resource.
      */
     private def loadBundle(): ResourceBundle = {
-        var localeTag = Preferences.instance.localeTag
+        var localeTag = Preferences.localeTag
         if (!AVAILABLE_LOCALES.contains(localeTag)) {
-            Preferences.instance.localeTag = DEFAULT_LOCALE
+            Preferences.localeTag = DEFAULT_LOCALE
             localeTag = DEFAULT_LOCALE
         }
         ResourceBundle.getBundle(BUNDLE_NAME, Locale.forLanguageTag(localeTag))
-    }// loadBundle()
+    } // loadBundle()
 
     /**
      * Gets a string for current locale by its key. If it's not available for
@@ -71,25 +67,25 @@ object Messages {
      */
     private def getString(key: String): String = {
         try {
-            if (RESOURCE_BUNDLE.contains(key))
-                return RESOURCE_BUNDLE.get(key)
+            if (RESOURCE_BUNDLE.containsKey(key))
+                return RESOURCE_BUNDLE.getString(key)
 
             /*
              * Try to find the `key` in default locale.
              */
             if (!new Locale(DEFAULT_LOCALE).getLanguage().equals(
-                    RESOURCE_BUNDLE.getLocale().getLanguage())) {
+                RESOURCE_BUNDLE.getLocale().getLanguage())) {
                 if (mDefaultResourceBundle == null)
                     mDefaultResourceBundle = ResourceBundle.getBundle(
-                            BUNDLE_NAME, Locale.forLanguageTag(DEFAULT_LOCALE))
-                return mDefaultResourceBundle.get(key)
+                        BUNDLE_NAME, Locale.forLanguageTag(DEFAULT_LOCALE))
+                return mDefaultResourceBundle.getString(key)
             }
 
             null
         } catch {
             case e: MissingResourceException => null
         }
-    }// getString()
+    } // getString()
 
     /**
      * Map of resources IDs to their name.
@@ -102,19 +98,23 @@ object Messages {
      *
      * @param resId
      *            the resource ID.
+     * @param ars
+     *            if provided, will be used to format the string resource.
      * @return the string, or {@code null} if not found.
      */
-    def getString(resId: Int): String = {
-        if (MAP_IDS.contains(resId))
-            return getString(MAP_IDS.get(resId))
+    def getString(resId: Int, args: Any*): String = {
+        MAP_IDS.get(resId) match {
+            case Some(s) => return s.format(args: _*)
+            case None =>
+        }
 
         for (f <- R.string.getClass().getFields()) {
             if (Modifier.isStatic(f.getModifiers())
-                    && f.getType().isAssignableFrom(Integer.TYPE)) {
+                && f.getType().isAssignableFrom(Integer.TYPE)) {
                 try {
                     if (f.getInt(null) == resId) {
                         MAP_IDS += resId -> f.getName()
-                        return getString(f.getName())
+                        return getString(f.getName()).format(args: _*)
                     }
                 } catch {
                     case e: IllegalArgumentException =>
@@ -128,23 +128,10 @@ object Messages {
                         */
                         e.printStackTrace()
                 }
-            }// if
-        }// for
+            } // if
+        } // for
 
         null
-    }// getString()
-
-    /**
-     * Gets a formattable string and format it with {@code args}.
-     *
-     * @param resId
-     *            the resource ID.
-     * @param args
-     *            the format arguments.
-     * @return the formatted string.
-     * @throws NullPointerException
-     *             if the resource is not found.
-     */
-    def getString(resId: Int, args: Any*) = getString(resId).format(args : _*)
+    } // getString()
 
 }

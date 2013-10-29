@@ -7,13 +7,11 @@
 
 package group.pals.desktop.app.apksigner.utils
 
+import java.io.File
+import java.util.regex.Matcher
+
 import group.pals.desktop.app.apksigner.i18n.Messages
 import group.pals.desktop.app.apksigner.i18n.R
-
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.util.regex.Matcher
 
 /**
  * Helper class to sign APK files.
@@ -54,8 +52,8 @@ object Signer {
      *             if any occurred.
      */
     def sign(jdkPath: File, targetFile: File, keyFile: File,
-            storepass: Array[Char], alias: String,
-            keypass: Array[{Char]): String = {
+             storepass: Array[Char], alias: String,
+             keypass: Array[Char]): String = {
 
         /*
          * JDK for Linux does not need to specify full path
@@ -69,12 +67,12 @@ object Signer {
          * jarsigner -keystore KEY_FILE -sigalg MD5withRSA -digestalg SHA1
          * -storepass STORE_PASS -keypass KEY_PASS APK_FILE ALIAS_NAME
          */
-        var pb = new ProcessBuilder(Array(
-                jarsigner,
-                "-keystore", keyFile.getAbsolutePath(), "-sigalg",
-                "MD5withRSA", "-digestalg", "SHA1", "-storepass",
-                new String(storepass), "-keypass", new String(keypass),
-                targetFile.getAbsolutePath(), alias))
+        var pb = new ProcessBuilder(
+            jarsigner,
+            "-keystore", keyFile.getAbsolutePath(), "-sigalg",
+            "MD5withRSA", "-digestalg", "SHA1", "-storepass",
+            new String(storepass), "-keypass", new String(keypass),
+            targetFile.getAbsolutePath(), alias)
         var p = pb.start()
 
         var console = new StringBuilder()
@@ -106,29 +104,29 @@ object Signer {
             if (oldName.matches("(?si).*?unsigned.+")) {
                 if (oldName.matches(Texts.REGEX_APK_FILES))
                     newName = oldName.replaceFirst("(?si)unsigned",
-                            Matcher.quoteReplacement(SIGNED_UNALIGNED))
+                        Matcher.quoteReplacement(SIGNED_UNALIGNED))
                 else
                     newName = oldName.replaceFirst("(?si)unsigned",
-                            Matcher.quoteReplacement(SIGNED))
+                        Matcher.quoteReplacement(SIGNED))
             } else if (oldName.matches(Texts.REGEX_APK_FILES))
                 newName = Files.appendFilename(oldName, '_' + SIGNED_UNALIGNED)
             else if (oldName.matches(Texts.REGEX_JAR_FILES)
-                    || oldName.matches(Texts.REGEX_ZIP_FILES))
+                || oldName.matches(Texts.REGEX_ZIP_FILES))
                 newName = Files.appendFilename(oldName, '_' + SIGNED)
             else
                 newName = String.format("%s_%s", oldName, SIGNED)
 
             if (targetFile.renameTo(new File(targetFile.getParent()
-                    + File.separator + newName)))
+                + File.separator + newName)))
                 return null
 
             Messages.getString(
                 R.string.pmsg_file_is_signed_but_cannot_be_renamed_to_new_one,
                 newName)
-        }// results from console is empty
+        } // results from console is empty
         else {
             result
-        }// results from console is NOT empty
-    }// sign()
+        } // results from console is NOT empty
+    } // sign()
 
 }
