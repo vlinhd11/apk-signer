@@ -24,12 +24,18 @@ class BaseThread(threading.Thread):
     MSG_WARNING = -2
     MSG_ERROR = -3
 
-    def __init__(self):
+    def __init__(self, name=None):
         ''' Constructor.
+
+            Parameters:
+
+            :name:
+                the thread name.
         '''
 
         super(BaseThread, self).__init__()
 
+        self.name = name
         self.listeners = []
         #.__init__()
 
