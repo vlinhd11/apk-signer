@@ -12,16 +12,16 @@ UTF8 = 'UTF-8'
 EMPTY = ''
 ''' Regex to filter APK files.
 '''
-REGEX_APK_FILES = r'(?si).+\\.apk'
+REGEX_APK_FILES = r'(?si).+\.apk'
 ''' Regex to filter keystore files.
 '''
-REGEX_KEYSTORE_FILES = r'(?si).+\\.keystore'
+REGEX_KEYSTORE_FILES = r'(?si).+\.keystore'
 ''' Regex to filter JAR files.
 '''
-REGEX_JAR_FILES = r'(?si).+\\.jar'
+REGEX_JAR_FILES = r'(?si).+\.jar'
 ''' Regex to filter ZIP files.
 '''
-REGEX_ZIP_FILES = r'(?si).+\\.zip'
+REGEX_ZIP_FILES = r'(?si).+\.zip'
 ''' File extension of APK files.
 '''
 FILE_EXT_APK = '.apk'
