@@ -48,8 +48,6 @@ class JFileChooserEx(JFileChooser):
     ''' Extended class of ``JFileChooser``, which hacks some methods  :-)
     '''
 
-    default_file_ext = None
-
     def __init__(startup_dir=None):
         ''' Creates new instance.
 
@@ -58,7 +56,10 @@ class JFileChooserEx(JFileChooser):
             :startup_dir (File):
                 the startup directory.
         '''
+
         super(JFileChooserEx, self).__init__(startup_dir)
+
+        self.default_file_ext = None
         #.__init__()
 
     def add_filename_filter(regex, description):
