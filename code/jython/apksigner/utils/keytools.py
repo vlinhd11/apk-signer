@@ -7,10 +7,9 @@
 Utilities for keystore files.
 '''
 
-import array
+import hashlib
 
 import files
-import hashlib
 import texts
 
 from apksigner.i18n import messages, string
@@ -45,10 +44,10 @@ def list_entries(key_file, keystore_type, storepass):
 
     try:
         input_stream = BufferedInputStream(FileInputStream(key_file),
-                                          files.FILE_BUFFER)
+                                           files.FILE_BUFFER)
         try:
             key_store = KeyStore.getInstance(keystore_type)
-            key_store.load(input_stream, array.array('b', storepass))
+            key_store.load(input_stream, storepass)
 
             # HEADER
 
@@ -132,7 +131,7 @@ def list_entries(key_file, keystore_type, storepass):
     #.list_entries()
 
 def get_aliases(key_file, keystore_type, storepass):
-    ''' Gets all alias names from {@code key_file}.
+    ''' Gets all alias names from ``key_file``.
 
         Parameters:
 
