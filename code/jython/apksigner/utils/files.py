@@ -22,13 +22,6 @@ File handling buffer (reading, writing...) -- ``32 KiB``.
 '''
 FILE_BUFFER = 32 * 1024
 
-/**
-    * Removes invalid characters...
-    *
-    * @param name
-    *            the name to fix.
-    * @return the "fresh" name :-)
-    */
 def fix_filename(name):
     ''' Removes invalid characters...
 
@@ -57,12 +50,6 @@ class JFileChooserEx(JFileChooser):
 
     default_file_ext = None
 
-    /**
-        * Creates new instance.
-        *
-        * @param startup_dir
-        *            the startup directory.
-        */
     def __init__(startup_dir=None):
         ''' Creates new instance.
 
@@ -115,7 +102,7 @@ class JFileChooserEx(JFileChooser):
                     return re.match(regex, f.getName())
                 elif f.isDirectory():
                     return True
-                else
+                else:
                     return re.match(regex, f.getName())
                 #.accept()
 
@@ -212,7 +199,7 @@ def choose_file(startup_dir=None, regex_filename_filter=None, description=None):
     #.choose_file()
 
 def choose_file_to_save(startup_dir=None, default_file_ext=None,
-                        regex_filename_filter=None, description=None):
+    regex_filename_filter=None, description=None):
     ''' Opens a dialog to choose a file to save.
 
         Parameters:
