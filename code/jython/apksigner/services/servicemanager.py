@@ -11,7 +11,7 @@ from collections import OrderedDict
 
 from basethread import BaseThread
 
-''' Map of ``BaseThread``'s to their notifications.
+''' Map of ``BaseThread``'s to their listeners.
 '''
 _THREADS = OrderedDict()
 
@@ -23,7 +23,7 @@ def register_thread(thread):
         if msg._id == BaseThread.MSG_DONE:
             del THREADS[thread]
 
-    thread.notifications.append(_)
+    thread.listeners.append(_)
     THREADS[thread] = _
     #.register_thread()
 
@@ -33,8 +33,8 @@ def unregister_thread(thread):
 
     _ = THREADS.get(thread)
     if _:
-        if _ in thread.notifications:
-            thread.notifications.remove(_)
+        if _ in thread.listeners:
+            thread.listeners.remove(_)
         del THREADS[thread]
     #.unregister_thread()
 
