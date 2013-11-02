@@ -3,7 +3,11 @@
 #  See the file LICENSE at the root directory of this project for copying
 #  permission.
 
+import java
+import json
+
 from apksigner.i18n import messages, string
+from apksigner.utils import files
 from basethread import BaseThread
 
 import group.pals.desktop.app.apksigner.utils.Files
@@ -59,6 +63,9 @@ class Updater(BaseThread):
     ''' Maximum filesize allowed for the new version (``50 MiB``). '''
     MAX_UPDATE_FILESIZE = 50 * 1024 * 1024
 
+    ''' Maximum filesize allowed for the ``update.json`` (``64 KiB``). '''
+    MAX_UPDATE_JSON_FILESIZE = 64 * 1024
+
     ''' There is a local update file available. '''
     MSG_LOCAL_UPDATE_AVAILABLE = 1
 
@@ -87,11 +94,11 @@ class Updater(BaseThread):
             print('{} >> starting'.format(Updater.__name__))
 
             ### DOWNLOAD UPDATE.PROPERTIES AND PARSE INFO TO MEMORY
-            final Properties updateProperties = downloadUpdateProperties()
+            final Properties updateProperties = download_update_info()
             if (updateProperties == null || isInterrupted())
                 return
 
-            L.i("\tCurrent version: %,d (%s) -- Update version: %s",
+            print("\tCurrent version: %,d (%s) -- Update version: %s",
                     Sys.APP_VERSION_CODE, Sys.APP_VERSION_NAME,
                     updateProperties.getProperty(KEY_APP_VERSION_CODE))
 
@@ -121,139 +128,121 @@ class Updater(BaseThread):
         } catch (Exception e) {
             L.e("%s >> %s", Updater.class.getSimpleName(), e)
         } finally {
-            L.i("%s >> finishing", Updater.class.getSimpleName())
+            print("%s >> finishing", Updater.class.getSimpleName())
             sendNotification(MSG_DONE)
         }
     }// run()
 
-    /**
-     * Follows the redirection ({@ink Network#HTTP_STATUS_FOUND}) within
-     * {@link Network#MAX_REDIRECTION_ALLOWED}.
-     *
-     * @param url
-     *            the original URL.
-     * @return the last <i>established</i>-connection, maybe {@code null} if
-     *         could not connect to. You must always re-check the response code
-     *         before doing further actions.
-     */
-    private HttpURLConnection followRedirection(String url) {
-        L.i("%s >> followRedirection() >> %s", Updater.class.getSimpleName(),
-                url)
+    def follow_redirection(url):
+        ''' Follows the redirection ``httplib.FOUND`` within
+            ``network.MAX_REDIRECTION_ALLOWED``.
 
-        HttpURLConnection conn = Network.openHttpConnection(url)
-        if (conn == null)
-            return null
+            Parameters:
 
-        int redirectCount = 0
-        try {
+            :url:
+                the original URL.
+
+            Returns:
+                the last *established*-connection, maybe ``None`` if could not
+                connect to. You must always re-check the response code before
+                doing further actions.
+        '''
+
+        print('{} >> follow_redirection() >> {}'.format(Updater.__name__, url))
+
+        conn = network.open_java_url(url)
+        if not conn: return
+
+        import httplib
+        redirect_count = 0
+        try:
             conn.connect()
-            while (conn.getResponseCode() == Network.HTTP_STATUS_FOUND
-                    && redirectCount++ < Network.MAX_REDIRECTION_ALLOWED) {
-                final InputStream inputStream = conn.getInputStream()
+            while conn.getResponseCode() == httplib.FOUND and \
+                redirect_count + 1 < network.MAX_REDIRECTION_ALLOWED:
+                input_stream = conn.getInputStream()
 
-                /*
-                 * Expiration.
-                 */
-                String field = conn.getHeaderField(Network.HEADER_EXPIRES)
-                try {
-                    if (!Texts.isEmpty(field)
-                            && Calendar.getInstance().after(
-                                    new SimpleDateFormat(
-                                            Network.HEADER_DATE_FORMAT)
-                                            .parse(field))) {
-                        L.i("\t%,d is expired (%s)", conn.getResponseCode(),
-                                field)
-                        inputStream.close()
-                        return null
-                    }
-                } catch (ParseException e) {
-                    /*
-                     * Ignore it.
-                     */
-                    L.e("\tcan't parse '%s', ignoring it...", field)
-                }
+                # Expiration
+                field = conn.getHeaderField(network.HEADER_EXPIRES)
+                try:
+                    from java.text import SimpleDateFormat
+                    from java.util import Calendar
+                    if field and \
+                        Calendar.getInstance().after(
+                            SimpleDateFormat(network.HEADER_DATE_FORMAT).\
+                                parse(field)):
+                        print('\t{} -- expired ({})'.\
+                              format(conn.getResponseCode(), field))
+                        input_stream.close()
+                        return
+                except:
+                    # Shoud be ParseException, ignore it
+                    print('\tcan\'t parse "{}", ignoring it...'.format(field))
 
-                /*
-                 * Location.
-                 */
-                field = conn.getHeaderField(Network.HEADER_LOCATION)
-                if (Texts.isEmpty(field)) {
-                    L.i("\t%,d sends to null", conn.getResponseCode())
-                    inputStream.close()
-                    return null
-                }
+                # Location
+                field = conn.getHeaderField(network.HEADER_LOCATION)
+                if not field:
+                    print('\t{} >> sends to null'.format(conn.getResponseCode()))
+                    input_stream.close()
+                    return
 
-                /*
-                 * Close current connection and open the redirected URI.
-                 */
-                inputStream.close()
-                if ((conn = Network.openHttpConnection(field)) == null)
-                    return null
+                # Close current connection and open the redirected URI
+                input_stream.close()
+                conn = network.open_java_url(field))
+                if not conn: return
 
-                L.i("\t>> %s", field)
+                print('\t>> {}'.format(field))
                 conn.connect()
-            }// while
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        }
+
+                redirect_count += 1
+                #.while
+        except:
+            # TODO
+            pass
 
         return conn
-    }// followRedirection()
+        #.follow_redirection()
 
-    /**
-     * Downloads the `update.properties` file from server.
-     *
-     * @return the {@link Properties} object containing update information. Or
-     *         {@code null} if an error occurred.
-     */
-    private Properties downloadUpdateProperties() {
-        L.i("%s >> downloadUpdateProperties()", Updater.class.getSimpleName())
+    def download_update_info():
+        ''' Downloads the `update.json` file from server.
 
-        for (String url : URLS_UPDATE_PROPERTIES) {
-            HttpURLConnection conn = followRedirection(url)
-            if (conn == null)
-                return null
+            Returns:
+                the dictionary (parsing from the JSON), or ``None`` if an error
+                occurred.
+        '''
 
-            try {
-                final InputStream inputStream = new BufferedInputStream(
-                        conn.getInputStream(), Files.FILE_BUFFER)
-                try {
-                    if (conn.getResponseCode() != Network.HTTP_STATUS_OK)
+        print('{} >> download_update_info()'.format(Updater.__name__))
+
+        for url in URLS_UPDATE_JSON:
+            conn = follow_redirection(url)
+            if not conn: return
+
+            try:
+                import java
+                input_stream = java.io.BufferedInputStream(
+                    conn.getInputStream(), files.FILE_BUFFER)
+                try:
+                    if conn.getResponseCode() != network.OK:
                         continue
-                    if (conn.getContentLength() > MAX_UPDATE_PROPERTIES_FILESIZE)
+                    length = conn.getContentLength()
+                    if length > MAX_UPDATE_JSON_FILESIZE:
                         continue
 
-                    /*
-                     * We can load directly from the `InputStream` over the
-                     * network, since the size is small.
-                     */
-                    Properties result = new Properties()
-                    result.load(inputStream)
-                    return result
-                } finally {
-                    inputStream.close()
-                }
-            } catch (IOException e) {
-                /*
-                 * Ignore it.
-                 */
-                e.printStackTrace()
-
-                /*
-                 * Maybe the current URL doesn't exist. Try the next one.
-                 */
+                    # We can load directly from the `InputStream` over the
+                    # network, since the size is small.
+                    import jarray
+                    buf = jarray.zeros(length, 'b')
+                    if input_stream.read(buf) == length:
+                        try: return json.loads(buf.tostring())
+                        except: return
+                    return
+                finally:
+                    input_stream.close()
+            except:
+                # Ignore it. Maybe the current URL doesn't exist. Try the next
+                # one.
                 continue
-            } catch (NullPointerException e) {
-                /*
-                 * Ignore it.
-                 */
-                continue
-            }
-        }// for URL
-
-        return null
-    }// downloadUpdateProperties()
+            #.for
+        #.download_update_info()
 
     /**
      * Checks to see if there is update file which has been downloaded before.
@@ -263,7 +252,7 @@ class Updater(BaseThread):
      * @return {@code true} or {@code false}.
      */
     private boolean checklocalUpdateFile(Properties updateProperties) {
-        L.i("%s >> checklocalUpdateFile()", Updater.class.getSimpleName())
+        print("%s >> checklocalUpdateFile()", Updater.class.getSimpleName())
 
         File file = new File(Sys.getAppDir().getAbsolutePath()
                 + File.separator
@@ -278,16 +267,16 @@ class Updater(BaseThread):
 
                 final byte[] buf = new byte[Files.FILE_BUFFER]
                 int read
-                final InputStream inputStream = new BufferedInputStream(
+                final InputStream input_stream = new BufferedInputStream(
                         new FileInputStream(file), Files.FILE_BUFFER)
                 try {
-                    while ((read = inputStream.read(buf)) > 0) {
+                    while ((read = input_stream.read(buf)) > 0) {
                         if (isInterrupted())
                             return false
                         md.update(buf, 0, read)
                     }
                 } finally {
-                    inputStream.close()
+                    input_stream.close()
                 }
 
                 BigInteger bi = new BigInteger(1, md.digest())
@@ -337,17 +326,17 @@ class Updater(BaseThread):
      *            the update information.
      */
     private void downloadUpdateFile(Properties updateProperties) {
-        L.i("%s >> downloadUpdateFile()", Updater.class.getSimpleName())
+        print("%s >> downloadUpdateFile()", Updater.class.getSimpleName())
 
-        HttpURLConnection conn = followRedirection(Sys.DEBUG ? DEBUG_UPDATE_LINK_EXECUTABLE
+        HttpURLConnection conn = follow_redirection(Sys.DEBUG ? DEBUG_UPDATE_LINK_EXECUTABLE
                 : updateProperties.getProperty(KEY_DOWNLOAD_URI))
         if (conn == null)
             return
 
         try {
-            final InputStream inputStream = conn.getInputStream()
+            final InputStream input_stream = conn.getInputStream()
             try {
-                if (conn.getResponseCode() != Network.HTTP_STATUS_OK)
+                if (conn.getResponseCode() != network.HTTP_STATUS_OK)
                     return
 
                 final int contentLength = conn.getContentLength()
@@ -443,7 +432,7 @@ class Updater(BaseThread):
                     byte[] buf = new byte[Files.FILE_BUFFER]
                     int read
                     long tick = System.nanoTime()
-                    while ((read = inputStream.read(buf)) > 0) {
+                    while ((read = input_stream.read(buf)) > 0) {
                         if (isInterrupted()) {
                             outputStream.close()
                             targetFile.delete()
@@ -515,8 +504,8 @@ class Updater(BaseThread):
                     timer.cancel()
                 }
             } finally {
-                if (inputStream != null)
-                    inputStream.close()
+                if (input_stream != null)
+                    input_stream.close()
             }
         } catch (Throwable t) {
             /*
