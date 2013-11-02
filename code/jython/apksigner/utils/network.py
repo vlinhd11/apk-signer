@@ -39,6 +39,10 @@ HEADER_EXPIRES = 'Expires'
 def open_url(url):
     ''' Opens new connection to ``url`` with default settings.
 
+        **NOTE:** Currently this function doesn't work because of issue #2103:
+        http://bugs.jython.org/issue2103 -- You should use the Java wrapper
+        instead: ``open_java_url(url)``.
+
         Parameters:
 
         :url (String):
@@ -55,7 +59,7 @@ def open_url(url):
         proxy_handler = urllib2.ProxyHandler({ 'http': _, 'https': _ })
 
         proxy_auth_handler = None
-        if settings.get_proxy_username and settings.get_proxy_password:
+        if settings.get_proxy_username() and settings.get_proxy_password():
             pwd_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
             pwd_mgr.add_password(None, settings.get_proxy_host(),
                                  settings.get_proxy_username(),
@@ -63,8 +67,80 @@ def open_url(url):
             proxy_auth_handler = urllib2.ProxyBasicAuthHandler(pwd_mgr)
 
         opener = urllib2.build_opener(proxy_handler, proxy_auth_handler)
-        return opener.open(url, timeout=NETWORK_TIMEOUT)
+        try:
+            return opener.open(url, timeout=NETWORK_TIMEOUT)
+        except:
+            # Perhaps there is no available Internet connections.
+            pass
+        #.if
 
-    return urllib2.urlopen(url, timeout=NETWORK_TIMEOUT)
+    try:
+        return urllib2.urlopen(url, timeout=NETWORK_TIMEOUT)
+    except:
+        # Perhaps there is no available Internet connections.
+        pass
 
     #.open_url()
+
+def open_java_url(url):
+    ''' Opens new connection to ``url`` with default settings.
+
+        Parameters:
+
+        :url (String):
+            the URL.
+
+        Returns:
+            the ``java.net.HttpURLConnection``, or ``None`` if an error
+            occurred.
+    '''
+
+    PROPERTY_SYS_HTTP_PROXY_HOST = 'http.proxyHost'
+    PROPERTY_SYS_HTTP_PROXY_PORT = 'http.proxyPort'
+
+    PROPERTY_SYS_HTTPS_PROXY_HOST = 'https.proxyHost'
+    PROPERTY_SYS_HTTPS_PROXY_PORT = 'https.proxyPort'
+
+    if not url: return
+
+    import java
+
+    # Proxies
+
+    if settings.is_using_proxy():
+        java.lang.System.setProperty(PROPERTY_SYS_HTTP_PROXY_HOST,
+                                     settings.get_proxy_host())
+        java.lang.System.setProperty(PROPERTY_SYS_HTTP_PROXY_PORT,
+                                     str(settings.get_proxy_port()))
+
+        java.lang.System.setProperty(PROPERTY_SYS_HTTPS_PROXY_HOST,
+                                     settings.get_proxy_host())
+        java.lang.System.setProperty(PROPERTY_SYS_HTTPS_PROXY_PORT,
+                                     str(settings.get_proxy_port()))
+    else:
+        for s in [ PROPERTY_SYS_HTTP_PROXY_HOST, PROPERTY_SYS_HTTP_PROXY_PORT,
+                   PROPERTY_SYS_HTTPS_PROXY_HOST, PROPERTY_SYS_HTTPS_PROXY_PORT ]:
+            java.lang.System.clearProperty(s)
+
+    # Now create connection
+
+    try:
+        conn = java.net.HttpURLConnection(java.net.URL(url).openConnection())
+
+        if settings.is_using_proxy():
+            if settings.get_proxy_username() and settings.get_proxy_password():
+                import base64
+                proxy_auth = base64.urlsafe_b64encode('{}:{}'.format(
+                    settings.get_proxy_username(),
+                    settings.get_proxy_password()))
+                # https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
+                conn.setRequestProperty('Proxy-Authorization',
+                                        'Basic ' + proxy_auth)
+
+        conn.setConnectTimeout(NETWORK_TIMEOUT * 1000)
+        conn.setReadTimeout(NETWORK_TIMEOUT * 1000)
+        return conn
+    except:
+        # Perhaps there is no available Internet connections.
+        pass
+    #.open_java_url()
