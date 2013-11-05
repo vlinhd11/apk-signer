@@ -3,42 +3,11 @@
 #  See the file LICENSE at the root directory of this project for copying
 #  permission.
 
-import java
-import json
-
-from apksigner.i18n import messages, string
-from apksigner.utils import files
+import httplib, jarray, json
 from basethread import BaseThread
 
-import group.pals.desktop.app.apksigner.utils.Files
-import group.pals.desktop.app.apksigner.utils.Hasher
-import group.pals.desktop.app.apksigner.utils.L
-import group.pals.desktop.app.apksigner.utils.Network
-import group.pals.desktop.app.apksigner.utils.SpeedTracker
-import group.pals.desktop.app.apksigner.utils.Sys
-import group.pals.desktop.app.apksigner.utils.Texts
-
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.math.BigInteger
-import java.net.HttpURLConnection
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Properties
-import java.util.Timer
-import java.util.TimerTask
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+from apksigner.i18n import messages, string
+from apksigner.utils import files, system
 
 class Updater(BaseThread):
     '''
@@ -52,13 +21,17 @@ class Updater(BaseThread):
     URLS_UPDATE_JSON = [
         'http://dl.bintray.com/hai%20bison%20apps/android/apk-signer/update.json',
         'https://bitbucket.org/haibisonapps/apk-signer/downloads/update.json',
-        'https://sites.google.com/site/haibisonapps/apps/apk-signer/update.json' ]
+        'https://apk-signer.googlecode.com/hg/bin/update.json' ]
 
     KEY_APP_VERSION_CODE = 'app_version_code'
     KEY_APP_VERSION_NAME = 'app_version_name'
     KEY_DOWNLOAD_URI = 'download_uri'
     KEY_DOWNLOAD_FILENAME = 'download_filename'
     KEY_DOWNLOAD_FILE_SHA1 = 'download_file_sha1'
+    KEY_UPDATE_TYPE = 'update_type'
+
+    UPDATE_TYPE_PATCHES = 'patches'
+    UPDATE_TYPE_RELEASE = 'release'
 
     ''' Maximum filesize allowed for the new version (``50 MiB``). '''
     MAX_UPDATE_FILESIZE = 50 * 1024 * 1024
@@ -89,31 +62,34 @@ class Updater(BaseThread):
             messages.get_string(string.updater_service))
         #.__init__()
 
-    def run():
+    def run(self):
+        ''' Main jobs.
+        '''
+
         try:
-            print('{} >> starting'.format(Updater.__name__))
+            print(' > {}: starting'.format(Updater.__name__))
 
-            ### DOWNLOAD UPDATE.PROPERTIES AND PARSE INFO TO MEMORY
-            final Properties updateProperties = download_update_info()
-            if (updateProperties == null || isInterrupted())
-                return
+            ### DOWNLOAD ``update.json`` AND PARSE INFO TO MEMORY
 
-            print("\tCurrent version: %,d (%s) -- Update version: %s",
-                    Sys.APP_VERSION_CODE, Sys.APP_VERSION_NAME,
-                    updateProperties.getProperty(KEY_APP_VERSION_CODE))
+            for url in self.URLS_UPDATE_JSON:
+                if self.is_interrupted(): return
 
-            try {
-                if (Sys.APP_VERSION_CODE >= Integer.parseInt(updateProperties
-                        .getProperty(KEY_APP_VERSION_CODE)) && !Sys.DEBUG)
+                update = self.download(url)
+                if not update: continue
+
+                try: update = json.loads(update)
+                except: return
+                #.for
+            #.download_update_info()
+
+            print('\t> Current version: {} ({}) -- Update version: {}'.format(
+                  system.APP_VERSION_CODE, system.APP_VERSION_NAME,
+                  update.get(self.KEY_APP_VERSION_CODE))
+
+            try:
+                if system.APP_VERSION_CODE >= update[self.KEY_APP_VERSION_CODE]:
                     return
-            } catch (Throwable t) {
-                /*
-                 * Can be number format exception or NPE...
-                 */
-                return
-            }
-
-            L.d("\t>> %s", updateProperties)
+            except: return
 
             /*
              * CHECK TO SEE IF THE UPDATE FILE HAS BEEN DOWNLOADED BEFORE
@@ -125,15 +101,14 @@ class Updater(BaseThread):
              * DOWNLOAD THE UPDATE FILE
              */
             downloadUpdateFile(updateProperties)
-        } catch (Exception e) {
-            L.e("%s >> %s", Updater.class.getSimpleName(), e)
-        } finally {
-            print("%s >> finishing", Updater.class.getSimpleName())
-            sendNotification(MSG_DONE)
-        }
-    }// run()
+        except:
+            print(' ! {}: {}'.format(Updater.__name__, sys.exc_info()))
+        finally:
+            print(' > {}: finishing'.format(Updater.__name__))
+            send_notification(self.MSG_DONE)
+        #.run()
 
-    def follow_redirection(url):
+    def follow_redirection(self, url):
         ''' Follows the redirection ``httplib.FOUND`` within
             ``network.MAX_REDIRECTION_ALLOWED``.
 
@@ -153,7 +128,6 @@ class Updater(BaseThread):
         conn = network.open_java_url(url)
         if not conn: return
 
-        import httplib
         redirect_count = 0
         try:
             conn.connect()
@@ -202,66 +176,69 @@ class Updater(BaseThread):
         return conn
         #.follow_redirection()
 
-    def download_update_info():
-        ''' Downloads the `update.json` file from server.
+    def download(self, url, handler=None):
+        ''' Downloads ``url``.
+
+            Parameters:
+
+            :url:
+                the URL.
+            :handler:
+                the function which accepts one parameter (a byte array). If it
+                is provided, it will be called to pass through the data
+                downloaded (in pieces).
+
+            If ``handler`` is not available, the data downloaded is returned.
 
             Returns:
-                the dictionary (parsing from the JSON), or ``None`` if an error
-                occurred.
+                ``None`` if any error occurred or ``handler`` is provided. Or
+                the data downloaded if ``handler`` is not provided.
         '''
 
-        print('{} >> download_update_info()'.format(Updater.__name__))
+        conn = self.follow_redirection(url)
+        if not conn: return
 
-        for url in URLS_UPDATE_JSON:
-            conn = follow_redirection(url)
-            if not conn: return
+        if not handler: data = jarray.zeros(0, 'b')
 
-            try:
-                import java
-                input_stream = java.io.BufferedInputStream(
-                    conn.getInputStream(), files.FILE_BUFFER)
-                try:
-                    if conn.getResponseCode() != network.OK:
-                        continue
-                    length = conn.getContentLength()
-                    if length > MAX_UPDATE_JSON_FILESIZE:
-                        continue
+        try:
+            conn.connect()
+            stream = conn.getInputStream()
+        except: return
 
-                    # We can load directly from the `InputStream` over the
-                    # network, since the size is small.
-                    import jarray
-                    buf = jarray.zeros(length, 'b')
-                    if input_stream.read(buf) == length:
-                        try: return json.loads(buf.tostring())
-                        except: return
-                    return
-                finally:
-                    input_stream.close()
-            except:
-                # Ignore it. Maybe the current URL doesn't exist. Try the next
-                # one.
-                continue
-            #.for
-        #.download_update_info()
+        try:
+            buf = jarray.zeros(1024 * 32, 'b')
+            while 1:
+                read = stream.read(buf)
+                if read <= 0: break
+                if handler: handler(buf[:read])
+                else: data += buf[:read]
+        except: return
+        finally:
+            try: stream.close()
+            except: return
 
-    /**
-     * Checks to see if there is update file which has been downloaded before.
-     *
-     * @param updateProperties
-     *            the update information.
-     * @return {@code true} or {@code false}.
-     */
-    def check_local_update_file(Properties updateProperties) {
-        print("%s >> check_local_update_file()", Updater.class.getSimpleName())
+        if not handler: return data
+        #.download()
 
-        File file = new File(Sys.getAppDir().getAbsolutePath()
-                + File.separator
-                + Files.fixFilename(updateProperties
-                        .getProperty(KEY_DOWNLOAD_FILENAME)))
-        if (file.isFile()) {
-            /*
-             * Check SHA-1.
-             */
+    def check_local_update_file(update_info):
+        ''' Checks to see if there is update file which has been downloaded
+            before.
+
+            Parameters:
+
+            :update_info:
+                the update information.
+
+            Returns:
+                ``True`` or ``None``.
+        '''
+
+        print('{} >> check_local_update_file()'.format(Updater.__name__))
+
+        filename = os.path.join(os.path.dirname(sys.argv[0]),
+                                update_info[KEY_DOWNLOAD_FILENAME])
+        if os.path.isfile(filename):
+            # Check SHA-1
             try {
                 MessageDigest md = MessageDigest.getInstance(Hasher.SHA1)
 
@@ -294,30 +271,7 @@ class Updater(BaseThread):
                                     updateProperties
                                             .getProperty(KEY_APP_VERSION_NAME)))
                 return result
-            } catch (NoSuchAlgorithmException e) {
-                /*
-                 * Never catch this.
-                 */
-                e.printStackTrace()
-                return false
-            } catch (FileNotFoundException e) {
-                /*
-                 * Never catch this.
-                 */
-                e.printStackTrace()
-                return false
-            } catch (IOException e) {
-                /*
-                 * Ignore it.
-                 */
-                return false
-            } catch (NullPointerException e) {
-                return false
-            }
-        }// file.isFile()
-        else
-            return false
-    }// check_local_update_file()
+        #.check_local_update_file()
 
     /**
      * Downloads the update file.
@@ -513,5 +467,6 @@ class Updater(BaseThread):
              */
             t.printStackTrace()
         }
-    }// downloadUpdateFile()
+    }/ downloadUpdateFile()
+
 }

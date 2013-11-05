@@ -37,6 +37,7 @@ class BaseThread(threading.Thread):
 
         self.name = name
         self.listeners = []
+        self._interrupted = None
         #.__init__()
 
     def send_notification(msg):
@@ -61,5 +62,20 @@ class BaseThread(threading.Thread):
         for l in listeners:
             if l(msg): return True
         #.send_notification()
+
+    def interrupt(self):
+        ''' Set this thread's status as interrupted. You should often check the
+            status by ``is_interrupted()``.
+        '''
+
+        self._interrupted = True
+        #.interrupt()
+
+    def is_interrupted(self):
+        ''' Checks this thread's interruption status.
+        '''
+
+        return self._interrupted
+        #.is_interrupted()
 
     #.BaseThread
