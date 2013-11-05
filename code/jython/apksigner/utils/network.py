@@ -103,29 +103,29 @@ def open_java_url(url):
 
     if not url: return
 
-    import java
-
     # Proxies
 
+    from java.lang import System
     if settings.is_using_proxy():
-        java.lang.System.setProperty(PROPERTY_SYS_HTTP_PROXY_HOST,
-                                     settings.get_proxy_host())
-        java.lang.System.setProperty(PROPERTY_SYS_HTTP_PROXY_PORT,
-                                     str(settings.get_proxy_port()))
+        System.setProperty(PROPERTY_SYS_HTTP_PROXY_HOST,
+                           settings.get_proxy_host())
+        System.setProperty(PROPERTY_SYS_HTTP_PROXY_PORT,
+                           str(settings.get_proxy_port()))
 
-        java.lang.System.setProperty(PROPERTY_SYS_HTTPS_PROXY_HOST,
-                                     settings.get_proxy_host())
-        java.lang.System.setProperty(PROPERTY_SYS_HTTPS_PROXY_PORT,
-                                     str(settings.get_proxy_port()))
+        System.setProperty(PROPERTY_SYS_HTTPS_PROXY_HOST,
+                           settings.get_proxy_host())
+        System.setProperty(PROPERTY_SYS_HTTPS_PROXY_PORT,
+                           str(settings.get_proxy_port()))
     else:
         for s in [ PROPERTY_SYS_HTTP_PROXY_HOST, PROPERTY_SYS_HTTP_PROXY_PORT,
                    PROPERTY_SYS_HTTPS_PROXY_HOST, PROPERTY_SYS_HTTPS_PROXY_PORT ]:
-            java.lang.System.clearProperty(s)
+            System.clearProperty(s)
 
     # Now create connection
 
     try:
-        conn = java.net.HttpURLConnection(java.net.URL(url).openConnection())
+        from java.net import URL
+        conn = URL(url).openConnection()
 
         if settings.is_using_proxy():
             if settings.get_proxy_username() and settings.get_proxy_password():

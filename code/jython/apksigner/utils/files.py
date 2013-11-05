@@ -8,13 +8,11 @@ import re
 from apksigner.i18n import messages, string
 from apksigner.utils.ui import dlg
 
-import java.awt.event.KeyEvent
-import java.io.File
-import java.util.regex.Pattern
+from java.awt.event import KeyEvent
+from java.io import File
 
-import javax.swing.JFileChooser
-import javax.swing.JOptionPane
-import javax.swing.filechooser.FileFilter
+from javax.swing import JFileChooser, JOptionPane
+from javax.swing.filechooser import FileFilter
 
 
 '''
@@ -76,7 +74,7 @@ class JFileChooserEx(JFileChooser):
             Returns:
                 new ``FileFilter``.
         '''
-        return add_filename_filter(regex, description, False)
+        return self.add_filename_filter(regex, description, False)
         #.add_filename_filter()
 
     def add_filename_filter(regex, description, set_as_main_filter):
@@ -98,8 +96,11 @@ class JFileChooserEx(JFileChooser):
         '''
         class _(FileFilter):
 
+            def __init__(self, parent):
+                self.parent = parent
+
             def accept(self, f):
-                if getFileSelectionMode() == DIRECTORIES_ONLY:
+                if self.parent.getFileSelectionMode() == DIRECTORIES_ONLY:
                     return re.match(regex, f.getName())
                 elif f.isDirectory():
                     return True
@@ -111,9 +112,9 @@ class JFileChooserEx(JFileChooser):
 
             #._
 
-        _ = _()
-        addChoosableFileFilter(_)
-        if set_as_main_filter: setFileFilter(_)
+        _ = _(self)
+        self.addChoosableFileFilter(_)
+        if set_as_main_filter: self.setFileFilter(_)
         return _
         #.add_filename_filter()
 
@@ -132,20 +133,20 @@ class JFileChooserEx(JFileChooser):
         ''' Overridden method.
         '''
 
-        if getDialogType() == self.SAVE_DIALOG:
-            if not getCurrentDirectory() \
-                or not getCurrentDirectory().canWrite():
+        if self.getDialogType() == self.SAVE_DIALOG:
+            if not self.getCurrentDirectory() \
+                or not self.getCurrentDirectory().canWrite():
                 dlg.show_err(
                     messages.get_string(string.msg_cannot_save_a_file_here))
                 return
 
-            f = getSelectedFile()
+            f = self.getSelectedFile()
             if f and self.default_file_ext:
                 if not re.match(
                     r'(?si).+' + re.escape(self.default_file_ext), f.getName()):
                     f = File(f.getParent() + File.separator + f.getName() \
                              + self.default_file_ext)
-                    setSelectedFile(f)
+                    self.setSelectedFile(f)
 
             if f and f.exists():
                 userOptions = [ messages.get_string(R.string.yes),
@@ -159,14 +160,15 @@ class JFileChooserEx(JFileChooser):
                     None, userOptions, userOptions[1])
                 if opt != 0: return
             #.SAVE_DIALOG
-        elif getDialogType() == self.OPEN_DIALOG:
-            f = getSelectedFile()
+        elif self.getDialogType() == self.OPEN_DIALOG:
+            f = self.getSelectedFile()
             if not f or not f.exists():
                 dlg.show_err(messages.get_string(
                     string.pmsg_file_not_exist,
                     f.getName() if f else ''))
                 return
 
+        # super() not working because of a bug in Jython
         JFileChooser.approveSelection(self)
         #.approveSelection()
 

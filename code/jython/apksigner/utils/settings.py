@@ -9,9 +9,7 @@ Convenient module for storing / loading settings.
 @author Hai Bison
 '''
 
-import json
-import os
-import sys
+import json, os, sys
 
 import system
 
@@ -31,8 +29,8 @@ def begin_transaction():
 def end_transaction():
     if not _transaction: return
 
-    global _transaction
     _settings.update(_transaction)
+    global _transaction
     _transaction = None
     #.end_transaction()
 

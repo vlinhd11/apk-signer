@@ -118,7 +118,7 @@ class Updater(BaseThread):
             /*
              * CHECK TO SEE IF THE UPDATE FILE HAS BEEN DOWNLOADED BEFORE
              */
-            if (isInterrupted() || checklocalUpdateFile(updateProperties))
+            if (isInterrupted() || check_local_update_file(updateProperties))
                 return
 
             /*
@@ -251,8 +251,8 @@ class Updater(BaseThread):
      *            the update information.
      * @return {@code true} or {@code false}.
      */
-    private boolean checklocalUpdateFile(Properties updateProperties) {
-        print("%s >> checklocalUpdateFile()", Updater.class.getSimpleName())
+    def check_local_update_file(Properties updateProperties) {
+        print("%s >> check_local_update_file()", Updater.class.getSimpleName())
 
         File file = new File(Sys.getAppDir().getAbsolutePath()
                 + File.separator
@@ -317,7 +317,7 @@ class Updater(BaseThread):
         }// file.isFile()
         else
             return false
-    }// checklocalUpdateFile()
+    }// check_local_update_file()
 
     /**
      * Downloads the update file.
