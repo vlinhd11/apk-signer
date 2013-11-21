@@ -10,10 +10,7 @@ This tool parses `messages.properties` to generates all strings to their
 respective IDs, then writes those to `R.java`.
 '''
 
-import os
-import os.path
-import re
-import sys
+import os, re, sys
 
 FILE_SOURCE = os.sep.join([os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0]))),
                            'code','src','group','pals','desktop','app',
