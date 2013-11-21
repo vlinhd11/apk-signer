@@ -19,7 +19,7 @@ class Updater(BaseThread):
     one of them doesn't exist, or for some reason we can't reach it).
     '''
     URLS_UPDATE_JSON = [
-        'http://dl.bintray.com/hai%20bison%20apps/android/apk-signer/update.json',
+        'https://dl.dropboxusercontent.com/u/237978006/android/apk-signer/update.json',
         'https://bitbucket.org/haibisonapps/apk-signer/downloads/update.json',
         'https://apk-signer.googlecode.com/hg/bin/update.json' ]
 
