@@ -1,44 +1,49 @@
 # apk-signer
 
-* Version: 1.8.5
+* Version: 2.0 beta
 
 ### Feel free to contact us at:
 
 * [Homepage](http://www.haibison.com)
-* E-mails  :
-    - haibisonapps[at]gmail.com
+* E-mails:
+    - haibison.apps[at]gmail.com
 
 
 ### We sincerely thank:
 
 * All of our friends, who have been contributing to this project.
-* The authors of external modules/ libraries which are used in this project.
+* The authors of external modules/libraries which are used in this project.
 
 We hope this project will be always useful for everyone.
 
 
-# CREDITS
+# Credits
 
 * Hans Bickel
-    + Library [TinyLaF](http://www.muntjak.de/hans/java/tinylaf/index.html)
-    + License: [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html)
+    + Library [TinyLaF]
+    + License: [GNU Lesser General Public License]
 * Leo Chien (contributor)
     + [Google+ page](https://plus.google.com/118055781130476825691?prsrc=2)
 * Robert Harder and his friends
-    + Module [FileDrop](http://www.iharder.net/current/java/filedrop/)
+    + Module [FileDrop]
     + License: Public Domain
 * The Android Open Source Project
-    + Module [AOSP Base64](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/util/)
-    + License: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+    + Module [AOSP Base64]
+    + License: [Apache License, Version 2.0]
 * Paul D. Hunt
-    + Font [Source Code Pro](https://www.google.com/fonts/)
-    + License: [SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007](http://scripts.sil.org/OFL)
+    + [Font Source Code Pro]
+    + License: [SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007]
 * Christian Robertson
-    + Font [Roboto](https://www.google.com/fonts/)
-    + License: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+    + [Font Roboto]
+    + License: [Apache License, Version 2.0]
 
 
-# HISTORY
+# History
+
+* Version 2.0 beta
+    + *Initialize:* July 8th, 2014
+    + Follow [Semantic Versioning] to name version.
+    + Start porting to [JRuby] in new branch `jruby`.
 
 * Version 1.8.5
     + *Release:* February 8th, 2014
@@ -71,7 +76,7 @@ We hope this project will be always useful for everyone.
 
 * Version 1.8
     + *Release:* July 22nd, 2013
-    + Optimize/ improve UI.
+    + Optimize/improve UI.
 
 * Version 1.8 beta
     + *Initialize:* July 21st, 2013
@@ -109,7 +114,7 @@ We hope this project will be always useful for everyone.
 
 * Version 1.7.3
     + *Release:* July 1st, 2013
-    + Improve performance when reading/ writing files.
+    + Improve performance when reading/writing files.
     + Module Signer: fix bug where the user cannot set his own alias name.
 
 * Version 1.7.2
@@ -147,7 +152,7 @@ We hope this project will be always useful for everyone.
 * Version 1.6.4
     + *Release:* June 26th, 2013
     + Fix some bugs.
-    + Panel Signer: adds file filters for APK/ JAR/ ZIP files.
+    + Panel Signer: adds file filters for APK/JAR/ZIP files.
 
 * Version 1.6.3
     + *Release:* June 26th, 2013
@@ -209,3 +214,15 @@ We hope this project will be always useful for everyone.
 
 * Version 1.1
     + *Release:* February 16th, 2012
+
+
+[AOSP Base64]: https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/util/
+[Apache License, Version 2.0]: http://www.apache.org/licenses/LICENSE-2.0
+[FileDrop]: http://www.iharder.net/current/java/filedrop/
+[Font Roboto]: https://www.google.com/fonts/
+[Font Source Code Pro]: https://www.google.com/fonts/
+[GNU Lesser General Public License]: http://www.gnu.org/licenses/lgpl.html
+[JRuby]: http://jruby.org/
+[Semantic Versioning]: https://en.wikipedia.org/wiki/Semantic_versioning#Semantic_versioning
+[SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007]: http://scripts.sil.org/OFL
+[TinyLaF]: http://www.muntjak.de/hans/java/tinylaf/index.html
