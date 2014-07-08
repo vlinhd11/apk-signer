@@ -1,6 +1,6 @@
 # apk-signer
 
-* Version: 2.0 beta
+* Version: 2.0 beta (#46)
 
 ### Feel free to contact us at:
 
@@ -40,7 +40,7 @@ We hope this project will be always useful for everyone.
 
 # History
 
-* Version 2.0 beta
+* Version 2.0 beta (#46)
     + *Initialize:* July 8th, 2014
     + Follow [Semantic Versioning] to name version.
     + Start porting to [JRuby] in new branch `jruby`.
